@@ -85,6 +85,10 @@ int main() {
     held_engine.set_params(held_params);
     held_engine.note_on(64, 1.0f);
     render_some(held_engine, PPF_SAMPLE_RATE * 2, 128);
+    float held_peak_before_release = render_peak(held_engine, 2048, 128);
+    if (held_peak_before_release < 1e-5f) {
+        fail("held note should remain audible before note_off");
+    }
     held_engine.note_off(64);
     float early_release_peak = render_peak(held_engine, 2048, 128);
     if (early_release_peak < 1e-5f) {
@@ -94,7 +98,11 @@ int main() {
     if (held_engine.debug_active_voice_count() == 0) {
         fail("held note release should not hard-cut immediately");
     }
-    render_some(held_engine, 98304, 128);
+    render_some(held_engine, PPF_SAMPLE_RATE * 2, 128);
+    if (held_engine.debug_active_voice_count() == 0) {
+        fail("max LPG decay should keep release active beyond 2 seconds");
+    }
+    render_some(held_engine, PPF_SAMPLE_RATE * 12, 128);
     if (held_engine.debug_active_voice_count() != 0) {
         fail("held note release should eventually finish");
     }

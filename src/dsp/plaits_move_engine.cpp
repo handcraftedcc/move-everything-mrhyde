@@ -117,6 +117,18 @@ static const float kSyncRateBars[] = {
 
 constexpr int kSyncRateCount = (int)(sizeof(kSyncRateBars) / sizeof(kSyncRateBars[0]));
 
+static int note_release_samples(const ppf_params_t &params) {
+    /* Allow long tails at high LPG decay; rely on voice stealing for budget control. */
+    float decay = clampf(params.lpg_decay, 0.0f, 1.0f);
+    float release_ms = 20.0f + powf(decay, 3.0f) * 12000.0f;
+    if ((float)params.env_release_ms > release_ms) {
+        release_ms = (float)params.env_release_ms;
+    }
+    int release_samples = (int)(release_ms * 0.001f * (float)PPF_SAMPLE_RATE);
+    if (release_samples < kChunkFrames) release_samples = kChunkFrames;
+    return release_samples;
+}
+
 static float sync_rate_hz_from_index(int index, float bpm) {
     int idx = clampi(index, 0, kSyncRateCount - 1);
     float clamped_bpm = clampf(bpm, 20.0f, 300.0f);
@@ -345,9 +357,7 @@ struct ppf_engine_t::Impl {
     }
 
     void release_matching_note(int note, int budget, const ppf_params_t &params) {
-        int release_ms = (int)lrintf(20.0f + clampf(params.lpg_decay, 0.0f, 1.0f) * 1200.0f);
-        int release_samples = (int)((float)release_ms * 0.001f * (float)PPF_SAMPLE_RATE);
-        if (release_samples < kChunkFrames) release_samples = kChunkFrames;
+        int release_samples = note_release_samples(params);
         for (int i = 0; i < budget; ++i) {
             VoiceState &v = voices[i];
             if (!v.active) continue;
@@ -508,9 +518,7 @@ void ppf_engine_t::poly_aftertouch(int note, float pressure) {
 
 void ppf_engine_t::all_notes_off() {
     int budget = impl_->active_voice_budget(params_);
-    int release_ms = (int)lrintf(20.0f + clampf(params_.lpg_decay, 0.0f, 1.0f) * 1200.0f);
-    int release_samples = (int)((float)release_ms * 0.001f * (float)PPF_SAMPLE_RATE);
-    if (release_samples < kChunkFrames) release_samples = kChunkFrames;
+    int release_samples = note_release_samples(params_);
     for (int i = 0; i < budget; ++i) {
         impl_->voices[i].gate = false;
         impl_->voices[i].release_samples_remaining = release_samples;
