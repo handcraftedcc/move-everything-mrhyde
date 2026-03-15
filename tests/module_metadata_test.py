@@ -73,17 +73,17 @@ if "morph" not in entries:
     fail("morph must be direct root parameter")
 if "fm_amount" not in entries:
     fail("fm_amount must be direct root parameter")
-if "pitch" not in entries:
-    fail("pitch must be direct root parameter")
-if "lpg_decay" not in entries or "lpg_color" not in entries:
-    fail("lpg_decay and lpg_color must be direct root parameters")
+if "pitch" in entries:
+    fail("pitch should be nested under LPG")
+if "lpg_decay" in entries or "lpg_color" in entries:
+    fail("lpg_decay and lpg_color should be nested under LPG")
 
 labels = [e.get("label") for e in entries if isinstance(e, dict)]
-for label in ["Pitch Mod", "Harmonics Mod", "Timbre Mod", "Morph Mod", "FM Mod", "Color Mod"]:
+for label in ["Harmonics Mod", "Timbre Mod", "Morph Mod", "FM Mod", "LPG"]:
     if label not in labels:
         fail(f"missing root submenu: {label}")
-if "LPG" in labels:
-    fail("LPG should not be a submenu")
+if "Pitch Mod" in labels or "Color Mod" in labels:
+    fail("Pitch Mod and Color Mod should be nested under LPG")
 
 root_knobs = root.get("knobs", [])
 expected_root_knobs = [
@@ -91,9 +91,7 @@ expected_root_knobs = [
     "harmonics",
     "timbre",
     "morph",
-    "fm_amount",
-    "lpg_decay",
-    "lpg_color",
+    "fm_amount"
 ]
 if root_knobs != expected_root_knobs:
     fail(f"root knobs must be {expected_root_knobs}, got {root_knobs}")
@@ -109,12 +107,12 @@ for forbidden_level in forbidden_levels:
         fail(f"forbidden level present: {forbidden_level}")
 
 expected_mod_names = {
-    "lfo": "LFO Amt",
-    "env": "Env Amt",
-    "cycle_env": "Cycle Env Amt",
-    "random": "Random Amt",
-    "velocity": "Velocity Amt",
-    "poly_aftertouch": "Poly Aftertouch Amt",
+    "lfo": "LFO",
+    "env": "Env",
+    "cycle_env": "Cycle Env",
+    "random": "Random",
+    "velocity": "Velocity",
+    "poly_aftertouch": "Poly Aftertouch",
 }
 
 for dest in dests:
@@ -176,17 +174,21 @@ for level_name in [
     "morph_mod",
     "fm_mod",
     "color_mod",
-    "lfo",
-    "envelope",
-    "cycle_env",
-    "random",
-    "velocity",
-    "poly_aftertouch",
-    "voice",
 ]:
     expected = level_param_keys(level_name)
     knobs = levels.get(level_name, {}).get("knobs", [])
     if knobs != expected:
         fail(f"{level_name} knobs should follow param order")
+
+lpg_level = levels.get("lpg", {})
+lpg_params = lpg_level.get("params", [])
+if "pitch" not in lpg_params:
+    fail("pitch must appear in LPG submenu")
+pitch_mod_in_lpg = any(isinstance(e, dict) and e.get("label") == "Pitch Mod" and e.get("level") == "pitch_mod" for e in lpg_params)
+if not pitch_mod_in_lpg:
+    fail("Pitch Mod submenu must be inside LPG submenu")
+color_mod_in_lpg = any(isinstance(e, dict) and e.get("label") == "Color Mod" and e.get("level") == "color_mod" for e in lpg_params)
+if not color_mod_in_lpg:
+    fail("Color Mod submenu must be inside LPG submenu")
 
 print("PASS: module metadata checks")
