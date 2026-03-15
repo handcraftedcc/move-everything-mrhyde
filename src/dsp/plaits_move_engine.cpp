@@ -261,8 +261,7 @@ void ppf_default_params(ppf_params_t *params) {
     params->random_retrig = 1;
 
     params->velocity_curve = 1.0f;
-    params->poly_aftertouch_curve = 1.0f;
-    params->poly_aftertouch_smoothing = 0.2f;
+    params->poly_aftertouch_curve = 0.0f;
 
     params->voice_mode = PPF_VOICE_POLY;
     params->polyphony = 4;
@@ -420,8 +419,7 @@ void ppf_engine_t::set_params(const ppf_params_t &params) {
     params_.cycle_decay_ms = clampi(params_.cycle_decay_ms, 1, 5000);
     params_.env_sustain = clampf(params_.env_sustain, 0.0f, 1.0f);
     params_.velocity_curve = clampf(params_.velocity_curve, 0.1f, 4.0f);
-    params_.poly_aftertouch_curve = clampf(params_.poly_aftertouch_curve, 0.1f, 4.0f);
-    params_.poly_aftertouch_smoothing = clampf(params_.poly_aftertouch_smoothing, 0.0f, 1.0f);
+    params_.poly_aftertouch_curve = clampf(params_.poly_aftertouch_curve, -1.0f, 1.0f);
     params_.glide_ms = clampi(params_.glide_ms, 0, 2000);
     params_.glide_ms = (params_.glide_ms / 5) * 5;
     params_.spread = clampf(params_.spread, 0.0f, 1.0f);
@@ -509,9 +507,7 @@ void ppf_engine_t::poly_aftertouch(int note, float pressure) {
     for (int i = 0; i < budget; ++i) {
         VoiceState &v = impl_->voices[i];
         if (v.active && v.note == note) {
-            float p = clampf(pressure, 0.0f, 1.0f);
-            float s = params_.poly_aftertouch_smoothing;
-            v.poly_aftertouch += (p - v.poly_aftertouch) * (1.0f - expf(-8.0f * (1.0f - s)));
+            v.poly_aftertouch = clampf(pressure, 0.0f, 1.0f);
         }
     }
 }
@@ -672,7 +668,7 @@ void ppf_engine_t::render(float *out_l, float *out_r, int frames) {
             src.cycle_env = cycle;
             src.random = v.random_value;
             src.velocity = curve_pow(v.velocity, params_.velocity_curve);
-            src.poly_aftertouch = curve_pow(v.poly_aftertouch, params_.poly_aftertouch_curve);
+            src.poly_aftertouch = ppf_apply_bipolar_curve(v.poly_aftertouch, params_.poly_aftertouch_curve);
 
             ppf_mod_amounts_t pm = params_.pitch_mod;
             ppf_mod_amounts_t hm = params_.harmonics_mod;

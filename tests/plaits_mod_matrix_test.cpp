@@ -46,6 +46,22 @@ int main() {
         fail("enabled modulation should respect clamp bounds");
     }
 
+    float linear = ppf_apply_bipolar_curve(0.25f, 0.0f);
+    expect_near(linear, 0.25f, 1e-6f, "bipolar curve at 0 must be linear");
+
+    float exp_shape = ppf_apply_bipolar_curve(0.25f, -1.0f);
+    if (!(exp_shape < linear)) {
+        fail("negative bipolar curve should produce exponential response");
+    }
+
+    float inv_exp_shape = ppf_apply_bipolar_curve(0.25f, 1.0f);
+    if (!(inv_exp_shape > linear)) {
+        fail("positive bipolar curve should produce inverse exponential response");
+    }
+
+    expect_near(ppf_apply_bipolar_curve(0.0f, -1.0f), 0.0f, 1e-6f, "curve should keep 0 endpoint");
+    expect_near(ppf_apply_bipolar_curve(1.0f, 1.0f), 1.0f, 1e-6f, "curve should keep 1 endpoint");
+
     std::printf("PASS: plaits modulation matrix behavior\n");
     return 0;
 }

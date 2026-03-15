@@ -563,8 +563,7 @@ static int set_param_internal(freak_instance_t *inst, const char *key, const cha
     SET_INT_FIELD("random_retrig", random_retrig, 0, 1);
 
     SET_FLOAT_FIELD("velocity_curve", velocity_curve, 0.1f, 4.0f);
-    SET_FLOAT_FIELD("poly_aftertouch_curve", poly_aftertouch_curve, 0.1f, 4.0f);
-    SET_FLOAT_FIELD("poly_aftertouch_smoothing", poly_aftertouch_smoothing, 0.0f, 1.0f);
+    SET_FLOAT_FIELD("poly_aftertouch_curve", poly_aftertouch_curve, -1.0f, 1.0f);
 
     SET_INT_FIELD("voice_mode", voice_mode, 0, 2);
     SET_INT_FIELD("polyphony", polyphony, 1, 8);
@@ -667,7 +666,6 @@ static int get_param_internal(const freak_instance_t *inst, const char *key, cha
 
     GET_FLOAT_FIELD("velocity_curve", velocity_curve);
     GET_FLOAT_FIELD("poly_aftertouch_curve", poly_aftertouch_curve);
-    GET_FLOAT_FIELD("poly_aftertouch_smoothing", poly_aftertouch_smoothing);
 
     GET_ENUM_FIELD("voice_mode", voice_mode);
     GET_INT_FIELD("polyphony", polyphony);

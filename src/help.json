@@ -72,8 +72,8 @@
         " sync rate: 16 bars",
         " .. 1/64",
         "Velocity curve",
-        "Poly AT curve +",
-        "smoothing"
+        "Poly AT curve",
+        "-1..+1 bipolar"
       ]
     },
     {

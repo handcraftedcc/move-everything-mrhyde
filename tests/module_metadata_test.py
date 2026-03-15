@@ -162,6 +162,18 @@ random_rate_meta = chain_params.get("random_rate", {})
 if random_rate_meta.get("type") != "float":
     fail("random_rate type must stay float for continuous unsynced use")
 
+poly_at_curve_meta = chain_params.get("poly_aftertouch_curve", {})
+if poly_at_curve_meta.get("type") != "float":
+    fail("poly_aftertouch_curve must be float")
+if poly_at_curve_meta.get("min") != -1.0 or poly_at_curve_meta.get("max") != 1.0:
+    fail("poly_aftertouch_curve must use bipolar range -1..1")
+if "poly_aftertouch_smoothing" in chain_params:
+    fail("poly_aftertouch_smoothing must be removed")
+
+poly_at_level = levels.get("poly_aftertouch", {})
+if poly_at_level.get("params") != ["poly_aftertouch_curve"]:
+    fail("poly_aftertouch level must only expose poly_aftertouch_curve")
+
 def level_param_keys(level_name: str):
     level = levels.get(level_name, {})
     out = []

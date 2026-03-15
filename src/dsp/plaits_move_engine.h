@@ -1,6 +1,7 @@
 #ifndef MOVE_EVERYTHING_PLAITS_MOVE_ENGINE_H
 #define MOVE_EVERYTHING_PLAITS_MOVE_ENGINE_H
 
+#include <math.h>
 #include <stdint.h>
 
 #ifdef __cplusplus
@@ -50,6 +51,20 @@ static inline float ppf_apply_destination_modulation(float base_value,
     return ppf_clampf(v, min_value, max_value);
 }
 
+static inline float ppf_apply_bipolar_curve(float x, float curve) {
+    x = ppf_clampf(x, 0.0f, 1.0f);
+    float c = ppf_clampf(curve, -1.0f, 1.0f);
+    if (c < 0.0f) {
+        float exp_amount = 1.0f + (-c) * 3.0f;
+        return powf(x, exp_amount);
+    }
+    if (c > 0.0f) {
+        float exp_amount = 1.0f + c * 3.0f;
+        return 1.0f - powf(1.0f - x, exp_amount);
+    }
+    return x;
+}
+
 typedef struct {
     int model;
     float pitch;
@@ -95,7 +110,6 @@ typedef struct {
 
     float velocity_curve;
     float poly_aftertouch_curve;
-    float poly_aftertouch_smoothing;
 
     int voice_mode;
     int polyphony;
