@@ -270,16 +270,16 @@
         "lfo": {
           "name": "LFO",
           "knobs": [
+            "lfo_sync",
             "lfo_shape",
             "lfo_rate",
-            "lfo_sync",
             "lfo_retrig",
             "lfo_phase"
           ],
           "params": [
+            "lfo_sync",
             "lfo_shape",
             "lfo_rate",
-            "lfo_sync",
             "lfo_retrig",
             "lfo_phase"
           ]
@@ -323,16 +323,16 @@
         "random": {
           "name": "Random",
           "knobs": [
+            "random_sync",
             "random_mode",
             "random_rate",
-            "random_sync",
             "random_slew",
             "random_retrig"
           ],
           "params": [
+            "random_sync",
             "random_mode",
             "random_rate",
-            "random_sync",
             "random_slew",
             "random_retrig"
           ]
@@ -793,6 +793,15 @@
         "max": 1.0
       },
       {
+        "key": "lfo_sync",
+        "name": "Mode",
+        "type": "enum",
+        "options": [
+          "free",
+          "sync"
+        ]
+      },
+      {
         "key": "lfo_shape",
         "name": "Shape",
         "type": "enum",
@@ -813,12 +822,21 @@
         "max": 40.0
       },
       {
-        "key": "lfo_sync",
-        "name": "Sync",
+        "key": "lfo_rate_sync",
+        "name": "Rate",
         "type": "enum",
         "options": [
-          "free",
-          "sync"
+          "16 bars",
+          "8 bars",
+          "4 bars",
+          "2 bars",
+          "1 bar",
+          "1/2",
+          "1/4",
+          "1/8",
+          "1/16",
+          "1/32",
+          "1/64"
         ]
       },
       {
@@ -931,6 +949,15 @@
         ]
       },
       {
+        "key": "random_sync",
+        "name": "Mode",
+        "type": "enum",
+        "options": [
+          "free",
+          "sync"
+        ]
+      },
+      {
         "key": "random_mode",
         "name": "Mode",
         "type": "enum",
@@ -948,12 +975,21 @@
         "max": 40.0
       },
       {
-        "key": "random_sync",
-        "name": "Sync",
+        "key": "random_rate_sync",
+        "name": "Rate",
         "type": "enum",
         "options": [
-          "free",
-          "sync"
+          "16 bars",
+          "8 bars",
+          "4 bars",
+          "2 bars",
+          "1 bar",
+          "1/2",
+          "1/4",
+          "1/8",
+          "1/16",
+          "1/32",
+          "1/64"
         ]
       },
       {

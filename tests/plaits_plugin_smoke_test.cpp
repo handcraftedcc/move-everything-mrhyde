@@ -51,6 +51,28 @@ static int has_json_label(const char *json, const char *label_text) {
     return strstr(json, compact) != NULL || strstr(json, spaced) != NULL;
 }
 
+static int chain_params_has_key_type(const char *json, const char *key, const char *type) {
+    if (!json || !key || !type) return 0;
+    char key_compact[128];
+    char key_spaced[128];
+    char type_compact[64];
+    char type_spaced[64];
+    snprintf(key_compact, sizeof(key_compact), "\"key\":\"%s\"", key);
+    snprintf(key_spaced, sizeof(key_spaced), "\"key\": \"%s\"", key);
+    snprintf(type_compact, sizeof(type_compact), "\"type\":\"%s\"", type);
+    snprintf(type_spaced, sizeof(type_spaced), "\"type\": \"%s\"", type);
+
+    const char *k = strstr(json, key_compact);
+    if (!k) k = strstr(json, key_spaced);
+    if (!k) return 0;
+
+    const char *end = strchr(k, '}');
+    if (!end) return 0;
+    const char *t = strstr(k, type_compact);
+    if (!t) t = strstr(k, type_spaced);
+    return t && t < end;
+}
+
 int main() {
     plugin_api_v2_t *api = move_plugin_init_v2(NULL);
     if (!api) fail("move_plugin_init_v2 returned null");
@@ -253,7 +275,7 @@ int main() {
         fail("cycle_attack_ms should clamp to integer minimum of 1ms");
     }
 
-    api->set_param(inst, "lfo_sync", "off");
+    api->set_param(inst, "lfo_sync", "free");
     api->set_param(inst, "lfo_rate", "3.5");
     char lfo_rate_buf[32];
     memset(lfo_rate_buf, 0, sizeof(lfo_rate_buf));
@@ -274,23 +296,24 @@ int main() {
         fail("lfo_sync should accept paramlfo-style sync text");
     }
 
-    api->set_param(inst, "lfo_sync", "on");
-    api->set_param(inst, "lfo_rate", "1/8");
-    memset(lfo_rate_buf, 0, sizeof(lfo_rate_buf));
-    if (api->get_param(inst, "lfo_rate", lfo_rate_buf, (int)sizeof(lfo_rate_buf)) < 0) {
-        fail("get_param(lfo_rate) failed");
+    api->set_param(inst, "lfo_sync", "sync");
+    api->set_param(inst, "lfo_rate_sync", "1/8");
+    char lfo_rate_sync_buf[32];
+    memset(lfo_rate_sync_buf, 0, sizeof(lfo_rate_sync_buf));
+    if (api->get_param(inst, "lfo_rate_sync", lfo_rate_sync_buf, (int)sizeof(lfo_rate_sync_buf)) < 0) {
+        fail("get_param(lfo_rate_sync) failed");
     }
-    if (strcmp(lfo_rate_buf, "1/8") != 0) {
-        fail("lfo_rate should return synced division label when sync is on");
+    if (strcmp(lfo_rate_sync_buf, "1/8") != 0) {
+        fail("lfo_rate_sync should return synced division label when sync is on");
     }
 
-    api->set_param(inst, "lfo_rate", "1/64");
-    memset(lfo_rate_buf, 0, sizeof(lfo_rate_buf));
-    if (api->get_param(inst, "lfo_rate", lfo_rate_buf, (int)sizeof(lfo_rate_buf)) < 0) {
-        fail("get_param(lfo_rate) failed after enum text set");
+    api->set_param(inst, "lfo_rate_sync", "1/64");
+    memset(lfo_rate_sync_buf, 0, sizeof(lfo_rate_sync_buf));
+    if (api->get_param(inst, "lfo_rate_sync", lfo_rate_sync_buf, (int)sizeof(lfo_rate_sync_buf)) < 0) {
+        fail("get_param(lfo_rate_sync) failed after enum text set");
     }
-    if (strcmp(lfo_rate_buf, "1/64") != 0) {
-        fail("lfo_rate should accept and return synced fraction labels");
+    if (strcmp(lfo_rate_sync_buf, "1/64") != 0) {
+        fail("lfo_rate_sync should accept and return synced fraction labels");
     }
 
     api->set_param(inst, "lfo_sync", "off");
@@ -319,7 +342,7 @@ int main() {
         fail("lfo_sync should accept paramlfo-style free text");
     }
 
-    api->set_param(inst, "random_sync", "off");
+    api->set_param(inst, "random_sync", "free");
     api->set_param(inst, "random_rate", "5.25");
     char random_rate_buf[32];
     memset(random_rate_buf, 0, sizeof(random_rate_buf));
@@ -339,23 +362,24 @@ int main() {
         fail("random_sync should accept paramlfo-style sync text");
     }
 
-    api->set_param(inst, "random_sync", "on");
-    api->set_param(inst, "random_rate", "1/8");
-    memset(random_rate_buf, 0, sizeof(random_rate_buf));
-    if (api->get_param(inst, "random_rate", random_rate_buf, (int)sizeof(random_rate_buf)) < 0) {
-        fail("get_param(random_rate) failed");
+    api->set_param(inst, "random_sync", "sync");
+    api->set_param(inst, "random_rate_sync", "1/8");
+    char random_rate_sync_buf[32];
+    memset(random_rate_sync_buf, 0, sizeof(random_rate_sync_buf));
+    if (api->get_param(inst, "random_rate_sync", random_rate_sync_buf, (int)sizeof(random_rate_sync_buf)) < 0) {
+        fail("get_param(random_rate_sync) failed");
     }
-    if (strcmp(random_rate_buf, "1/8") != 0) {
-        fail("random_rate should return synced division label when sync is on");
+    if (strcmp(random_rate_sync_buf, "1/8") != 0) {
+        fail("random_rate_sync should return synced division label when sync is on");
     }
 
-    api->set_param(inst, "random_rate", "1/64");
-    memset(random_rate_buf, 0, sizeof(random_rate_buf));
-    if (api->get_param(inst, "random_rate", random_rate_buf, (int)sizeof(random_rate_buf)) < 0) {
-        fail("get_param(random_rate) failed after enum text set");
+    api->set_param(inst, "random_rate_sync", "1/64");
+    memset(random_rate_sync_buf, 0, sizeof(random_rate_sync_buf));
+    if (api->get_param(inst, "random_rate_sync", random_rate_sync_buf, (int)sizeof(random_rate_sync_buf)) < 0) {
+        fail("get_param(random_rate_sync) failed after enum text set");
     }
-    if (strcmp(random_rate_buf, "1/64") != 0) {
-        fail("random_rate should accept and return synced fraction labels");
+    if (strcmp(random_rate_sync_buf, "1/64") != 0) {
+        fail("random_rate_sync should accept and return synced fraction labels");
     }
 
     api->set_param(inst, "random_sync", "off");
@@ -384,6 +408,8 @@ int main() {
         fail("random_sync should accept paramlfo-style free text");
     }
 
+    api->set_param(inst, "lfo_sync", "sync");
+    api->set_param(inst, "random_sync", "sync");
     char hierarchy_buf[32768];
     memset(hierarchy_buf, 0, sizeof(hierarchy_buf));
     if (api->get_param(inst, "ui_hierarchy", hierarchy_buf, (int)sizeof(hierarchy_buf)) <= 0) {
@@ -391,6 +417,12 @@ int main() {
     }
     if (hierarchy_buf[0] != '{') {
         fail("ui_hierarchy should be a JSON object");
+    }
+    if (strstr(hierarchy_buf, "\"lfo_rate_sync\"") == NULL) {
+        fail("ui_hierarchy should expose lfo_rate_sync key when lfo_sync is sync");
+    }
+    if (strstr(hierarchy_buf, "\"random_rate_sync\"") == NULL) {
+        fail("ui_hierarchy should expose random_rate_sync key when random_sync is sync");
     }
     if (!has_json_label(hierarchy_buf, "Assign 1*")) {
         fail("ui_hierarchy should mark active assign modulation page with star");
@@ -421,8 +453,6 @@ int main() {
     }
 
     char chain_params_buf[16384];
-    api->set_param(inst, "lfo_sync", "on");
-    api->set_param(inst, "random_sync", "on");
     memset(chain_params_buf, 0, sizeof(chain_params_buf));
     if (api->get_param(inst, "chain_params", chain_params_buf, (int)sizeof(chain_params_buf)) <= 0) {
         fail("chain_params get_param returned empty");
@@ -430,24 +460,17 @@ int main() {
     if (chain_params_buf[0] != '[') {
         fail("chain_params should be a JSON array");
     }
-    if (strstr(chain_params_buf, "\"key\":\"lfo_rate\",\"name\":\"Rate\",\"type\":\"enum\"") == NULL) {
-        fail("chain_params should expose lfo_rate as enum when lfo_sync is on");
+    if (!chain_params_has_key_type(chain_params_buf, "lfo_rate", "float")) {
+        fail("chain_params should expose lfo_rate float parameter");
     }
-    if (strstr(chain_params_buf, "\"key\":\"random_rate\",\"name\":\"Rate\",\"type\":\"enum\"") == NULL) {
-        fail("chain_params should expose random_rate as enum when random_sync is on");
+    if (!chain_params_has_key_type(chain_params_buf, "lfo_rate_sync", "enum")) {
+        fail("chain_params should expose lfo_rate_sync enum parameter");
     }
-
-    api->set_param(inst, "lfo_sync", "off");
-    api->set_param(inst, "random_sync", "off");
-    memset(chain_params_buf, 0, sizeof(chain_params_buf));
-    if (api->get_param(inst, "chain_params", chain_params_buf, (int)sizeof(chain_params_buf)) <= 0) {
-        fail("chain_params get_param returned empty after sync off");
+    if (!chain_params_has_key_type(chain_params_buf, "random_rate", "float")) {
+        fail("chain_params should expose random_rate float parameter");
     }
-    if (strstr(chain_params_buf, "\"key\":\"lfo_rate\",\"name\":\"Rate\",\"type\":\"float\"") == NULL) {
-        fail("chain_params should expose lfo_rate as float when lfo_sync is off");
-    }
-    if (strstr(chain_params_buf, "\"key\":\"random_rate\",\"name\":\"Rate\",\"type\":\"float\"") == NULL) {
-        fail("chain_params should expose random_rate as float when random_sync is off");
+    if (!chain_params_has_key_type(chain_params_buf, "random_rate_sync", "enum")) {
+        fail("chain_params should expose random_rate_sync enum parameter");
     }
 
     char state_buf[16384];
