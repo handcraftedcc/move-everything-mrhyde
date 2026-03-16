@@ -48,6 +48,11 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: dist/freak-module.tar.gz
+          body: |
+            - MicroFreak-inspired sound generator for Move Anything, built on Mutable Instruments Plaits.
+            - 24 Plaits engines with macro controls for harmonics, timbre, morph, FM, and LPG.
+            - Poly/mono/mono-legato voice modes with unison, live detune/spread, and Voice & Mix controls.
+            - Destination-based modulation with assignable targets, plus syncable LFO/random sources.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

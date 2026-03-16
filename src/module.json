@@ -2,7 +2,7 @@
   "id": "freak",
   "name": "Freak",
   "abbrev": "FRK",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "MicroFreak-inspired Plaits sound generator for Move Everything",
   "author": "move-anything contributors",
   "license": "MIT",

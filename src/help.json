@@ -53,8 +53,9 @@
         "Assign pages set",
         "target + source",
         "amounts. Targets",
-        "include volume",
-        "and pan. Active=*"
+        "include volume,",
+        "pan, detune,",
+        "spread. Active=*"
       ]
     },
     {
