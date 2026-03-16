@@ -273,7 +273,6 @@
             "lfo_sync",
             "lfo_shape",
             "lfo_rate",
-            "lfo_rate_sync",
             "lfo_retrig",
             "lfo_phase"
           ],
@@ -281,7 +280,6 @@
             "lfo_sync",
             "lfo_shape",
             "lfo_rate",
-            "lfo_rate_sync",
             "lfo_retrig",
             "lfo_phase"
           ]
@@ -328,7 +326,6 @@
             "random_sync",
             "random_mode",
             "random_rate",
-            "random_rate_sync",
             "random_slew",
             "random_retrig"
           ],
@@ -336,7 +333,6 @@
             "random_sync",
             "random_mode",
             "random_rate",
-            "random_rate_sync",
             "random_slew",
             "random_retrig"
           ]

@@ -418,17 +418,11 @@ int main() {
     if (hierarchy_buf[0] != '{') {
         fail("ui_hierarchy should be a JSON object");
     }
-    if (strstr(hierarchy_buf, "\"lfo_rate\"") == NULL) {
-        fail("ui_hierarchy should expose lfo_rate key");
-    }
     if (strstr(hierarchy_buf, "\"lfo_rate_sync\"") == NULL) {
-        fail("ui_hierarchy should expose lfo_rate_sync key");
-    }
-    if (strstr(hierarchy_buf, "\"random_rate\"") == NULL) {
-        fail("ui_hierarchy should expose random_rate key");
+        fail("ui_hierarchy should expose lfo_rate_sync key when lfo_sync is sync");
     }
     if (strstr(hierarchy_buf, "\"random_rate_sync\"") == NULL) {
-        fail("ui_hierarchy should expose random_rate_sync key");
+        fail("ui_hierarchy should expose random_rate_sync key when random_sync is sync");
     }
     if (!has_json_label(hierarchy_buf, "Assign 1*")) {
         fail("ui_hierarchy should mark active assign modulation page with star");
