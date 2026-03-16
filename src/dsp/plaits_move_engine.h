@@ -84,6 +84,7 @@ typedef struct {
     float timbre;
     float morph;
     float fm_amount;
+    float aux_mix;
     int filter_mode;
     float filter_cutoff;
     float filter_resonance;

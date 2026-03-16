@@ -66,6 +66,7 @@ int main() {
     api->set_param(inst, "timbre", "0.4");
     api->set_param(inst, "morph", "0.7");
     api->set_param(inst, "fm_amount", "0.2");
+    api->set_param(inst, "aux_mix", "0.5");
     api->set_param(inst, "voice_mode", "poly");
     api->set_param(inst, "lfo_shape", "saw");
     api->set_param(inst, "filter_mode", "bp");
@@ -163,6 +164,15 @@ int main() {
     }
     if (strcmp(cutoff_mod_buf, "0.5") != 0) {
         fail("cutoff_mod_lfo_amt should roundtrip as float amount");
+    }
+
+    char aux_mix_buf[32];
+    memset(aux_mix_buf, 0, sizeof(aux_mix_buf));
+    if (api->get_param(inst, "aux_mix", aux_mix_buf, (int)sizeof(aux_mix_buf)) < 0) {
+        fail("get_param(aux_mix) failed");
+    }
+    if (strcmp(aux_mix_buf, "0.5") != 0) {
+        fail("aux_mix should roundtrip as float amount");
     }
 
     char assign_target_buf[32];
@@ -324,6 +334,15 @@ int main() {
     }
     if (strcmp(restored_cutoff_mod_buf, "0.5") != 0) {
         fail("state restore via json_defaults should restore cutoff mod amount");
+    }
+
+    char restored_aux_mix_buf[32];
+    memset(restored_aux_mix_buf, 0, sizeof(restored_aux_mix_buf));
+    if (api->get_param(inst_from_state, "aux_mix", restored_aux_mix_buf, (int)sizeof(restored_aux_mix_buf)) < 0) {
+        fail("get_param(aux_mix) failed on restored instance");
+    }
+    if (strcmp(restored_aux_mix_buf, "0.5") != 0) {
+        fail("state restore via json_defaults should restore aux_mix");
     }
 
     uint8_t note_on[] = {0x90, 60, 100};

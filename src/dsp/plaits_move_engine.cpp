@@ -334,6 +334,7 @@ void ppf_default_params(ppf_params_t *params) {
     params->timbre = 0.5f;
     params->morph = 0.5f;
     params->fm_amount = 0.0f;
+    params->aux_mix = 0.0f;
     params->filter_mode = PPF_FILTER_LP;
     params->filter_cutoff = 1.0f;
     params->filter_resonance = 0.0f;
@@ -515,6 +516,7 @@ void ppf_engine_t::set_params(const ppf_params_t &params) {
     params_.timbre = clampf(params_.timbre, 0.0f, 1.0f);
     params_.morph = clampf(params_.morph, 0.0f, 1.0f);
     params_.fm_amount = clampf(params_.fm_amount, 0.0f, 1.0f);
+    params_.aux_mix = clampf(params_.aux_mix, 0.0f, 1.0f);
     params_.filter_mode = clampi(params_.filter_mode, 0, 2);
     params_.filter_cutoff = clampf(params_.filter_cutoff, 0.0f, 1.0f);
     params_.filter_resonance = clampf(params_.filter_resonance, 0.0f, 1.0f);
@@ -904,8 +906,12 @@ void ppf_engine_t::render(float *out_l, float *out_r, int frames) {
 
             float g_l = pan_gain_left(v.pan);
             float g_r = pan_gain_right(v.pan);
+            float aux_mix = params_.aux_mix;
             for (int j = 0; j < chunk; ++j) {
-                float mono = ((float)tmp[j].out / 32768.0f) * kFixedVoiceMixGain;
+                float out_main = (float)tmp[j].out / 32768.0f;
+                float out_aux = (float)tmp[j].aux / 32768.0f;
+                float blended = lerpf(out_main, out_aux, aux_mix);
+                float mono = blended * kFixedVoiceMixGain;
                 out_l[frame_pos + j] += mono * g_l;
                 out_r[frame_pos + j] += mono * g_r;
             }

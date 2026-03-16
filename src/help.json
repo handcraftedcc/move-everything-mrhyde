@@ -23,6 +23,8 @@
         "offset (+/-48)",
         "Harmonics, Timbre,",
         "Morph, FM Amount",
+        "Aux Mix (0 main,",
+        "0.5 blend, 1 aux)",
         "LPG Decay, Color",
         "all on Main page"
       ]

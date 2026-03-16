@@ -62,6 +62,7 @@
             "timbre",
             "morph",
             "fm_amount",
+            "aux_mix",
             "lpg_decay",
             "lpg_color"
           ],
@@ -72,6 +73,7 @@
             "timbre",
             "morph",
             "fm_amount",
+            "aux_mix",
             "lpg_decay",
             "lpg_color"
           ]
@@ -437,6 +439,13 @@
       {
         "key": "fm_amount",
         "name": "FM Amount",
+        "type": "float",
+        "min": 0.0,
+        "max": 1.0
+      },
+      {
+        "key": "aux_mix",
+        "name": "Aux Mix",
         "type": "float",
         "min": 0.0,
         "max": 1.0

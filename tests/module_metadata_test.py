@@ -34,6 +34,7 @@ required_keys = [
     "timbre",
     "morph",
     "fm_amount",
+    "aux_mix",
     "filter_mode",
     "filter_cutoff",
     "filter_resonance",
@@ -91,7 +92,7 @@ root = levels.get("root", {})
 entries = root.get("params", [])
 
 main_level = levels.get("main", {})
-expected_main_params = ["model", "pitch", "harmonics", "timbre", "morph", "fm_amount", "lpg_decay", "lpg_color"]
+expected_main_params = ["model", "pitch", "harmonics", "timbre", "morph", "fm_amount", "aux_mix", "lpg_decay", "lpg_color"]
 if main_level.get("params") != expected_main_params:
     fail(f"main level params must be {expected_main_params}")
 
@@ -135,6 +136,12 @@ expected_root_knobs = [
 ]
 if root_knobs != expected_root_knobs:
     fail(f"root knobs must be {expected_root_knobs}, got {root_knobs}")
+
+aux_mix_meta = chain_params.get("aux_mix", {})
+if aux_mix_meta.get("type") != "float":
+    fail("aux_mix must be float")
+if aux_mix_meta.get("min") != 0.0 or aux_mix_meta.get("max") != 1.0:
+    fail("aux_mix range must be 0..1")
 
 mod_level = levels.get("mod", {})
 mod_entries = mod_level.get("params", [])
@@ -251,7 +258,7 @@ if filter_level.get("params") != ["filter_mode", "filter_cutoff", "filter_resona
     fail("filter level must expose mode, cutoff, resonance")
 
 expected_submenu_knobs = {
-    "main": ["model", "pitch", "harmonics", "timbre", "morph", "fm_amount", "lpg_decay", "lpg_color"],
+    "main": ["model", "pitch", "harmonics", "timbre", "morph", "fm_amount", "aux_mix", "lpg_decay", "lpg_color"],
     "filter": ["filter_mode", "filter_cutoff", "filter_resonance"],
     "assign1_mod": ["assign1_target", "assign1_mod_lfo_amt", "assign1_mod_env_amt", "assign1_mod_cycle_env_amt", "assign1_mod_random_amt", "assign1_mod_velocity_amt", "assign1_mod_poly_aftertouch_amt"],
     "assign2_mod": ["assign2_target", "assign2_mod_lfo_amt", "assign2_mod_env_amt", "assign2_mod_cycle_env_amt", "assign2_mod_random_amt", "assign2_mod_velocity_amt", "assign2_mod_poly_aftertouch_amt"],
