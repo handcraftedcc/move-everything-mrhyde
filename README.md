@@ -10,11 +10,11 @@
 - Full destination-based modulation sources:
   - LFO, Envelope, Cycling Envelope, Random, Velocity, Poly Aftertouch
 - Global multimode post filter submenu (`LP/BP/HP`, `Cutoff`, `Resonance`)
-- Voice controls: mono/poly/mono legato, polyphony, unison, detune, spread, glide
+- Voice & Mix controls: volume, pan, mono/poly/mono legato, polyphony, unison, detune, spread, glide
 - Mono + mono-legato support unison stacks (single-note behavior, no chords)
 - Active modulation pages are marked with `*` in the `Mod` submenu
 - `Aux Mix` blends Plaits outputs (`0=main`, `0.5=equal`, `1=aux`)
-- Assign targets include `volume` and `pan` (in addition to macro/filter/pitch targets)
+- Assign targets include `volume`, `pan`, `detune`, and `spread` (in addition to macro/filter/pitch targets)
 - Audio release tail timing follows LPG decay (not ADSR release time)
 
 ## UI Map
@@ -25,7 +25,7 @@ Root levels:
 - `Filter`
 - `Mod`
 - `Mod Sources`
-- `Voice`
+- `Voice & Mix`
 
 Root knob mapping stays fixed to:
 

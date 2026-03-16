@@ -108,7 +108,9 @@ enum {
     PPF_ASSIGN_TIMBRE = 8,
     PPF_ASSIGN_FILTER_CUTOFF = 9,
     PPF_ASSIGN_VOLUME = 10,
-    PPF_ASSIGN_PAN = 11
+    PPF_ASSIGN_PAN = 11,
+    PPF_ASSIGN_DETUNE = 12,
+    PPF_ASSIGN_SPREAD = 13
 };
 
 enum {
@@ -143,7 +145,7 @@ static const float kSyncRateBars[] = {
 constexpr int kSyncRateCount = (int)(sizeof(kSyncRateBars) / sizeof(kSyncRateBars[0]));
 
 static int note_release_samples_from_decay(float decay_value) {
-    /* Follow Plaits' short_decay scaling and add safety headroom to avoid premature cutoff. */
+    /* Follow Plaits short_decay scaling; keep a small safety tail so voice deactivation never truncates audio. */
     float decay = clampf(decay_value, 0.0f, 1.0f);
     float short_decay = (200.0f * (float)kChunkFrames) / (float)PPF_SAMPLE_RATE *
                         semitones_to_ratio(-96.0f * decay);
@@ -153,8 +155,8 @@ static int note_release_samples_from_decay(float decay_value) {
         blocks_to_minus_80db = 1.0f;
     }
     float release_ms = (blocks_to_minus_80db * (float)kChunkFrames * 1000.0f) / (float)PPF_SAMPLE_RATE;
-    release_ms = release_ms * 1.35f + 750.0f;
-    release_ms = clampf(release_ms, 30.0f, 30000.0f);
+    release_ms = release_ms * 1.15f + 120.0f;
+    release_ms = clampf(release_ms, 20.0f, 25000.0f);
     int release_samples = (int)(release_ms * 0.001f * (float)PPF_SAMPLE_RATE);
     if (release_samples < kChunkFrames) release_samples = kChunkFrames;
     return release_samples;
@@ -226,7 +228,8 @@ struct VoiceState {
     float poly_aftertouch;
     float note_current;
     float note_target;
-    float pan;
+    int unison_slot;
+    float pan_current;
     uint32_t age;
     int trigger_blocks;
     int release_samples_remaining;
@@ -352,6 +355,8 @@ void ppf_default_params(ppf_params_t *params) {
     params->morph = 0.5f;
     params->fm_amount = 0.0f;
     params->aux_mix = 0.0f;
+    params->volume = 1.0f;
+    params->pan = 0.0f;
     params->filter_mode = PPF_FILTER_LP;
     params->filter_cutoff = 1.0f;
     params->filter_resonance = 0.0f;
@@ -417,7 +422,8 @@ struct ppf_engine_t::Impl {
             v.poly_aftertouch = 0.0f;
             v.note_current = 0.0f;
             v.note_target = 0.0f;
-            v.pan = 0.0f;
+            v.unison_slot = 0;
+            v.pan_current = 0.0f;
             v.age = 0;
             v.trigger_blocks = 0;
             v.release_samples_remaining = 0;
@@ -465,18 +471,19 @@ struct ppf_engine_t::Impl {
         return oldest;
     }
 
-    void trigger_voice(VoiceState &v, int note, float velocity, float detune, float pan, bool retrig_env) {
+    void trigger_voice(VoiceState &v, int note, int unison_slot, float velocity, float detune, float pan, bool retrig_env) {
         bool was_active = v.active && v.gate;
         v.active = true;
         v.gate = true;
         v.note = note;
+        v.unison_slot = unison_slot;
         v.velocity = clampf(velocity, 0.0f, 1.0f);
         v.age = age_counter++;
         v.note_target = (float)note + detune;
         if (!was_active) {
             v.note_current = v.note_target;
         }
-        v.pan = clampf(pan, -1.0f, 1.0f);
+        v.pan_current = clampf(pan, -1.0f, 1.0f);
         v.trigger_blocks = kMaxTriggerBlocks;
         v.release_samples_remaining = 0;
         v.release_samples_total = 0;
@@ -535,13 +542,15 @@ void ppf_engine_t::set_params(const ppf_params_t &params) {
     params_.morph = clampf(params_.morph, 0.0f, 1.0f);
     params_.fm_amount = clampf(params_.fm_amount, 0.0f, 1.0f);
     params_.aux_mix = clampf(params_.aux_mix, 0.0f, 1.0f);
+    params_.volume = clampf(params_.volume, 0.0f, 2.0f);
+    params_.pan = clampf(params_.pan, -1.0f, 1.0f);
     params_.filter_mode = clampi(params_.filter_mode, 0, 2);
     params_.filter_cutoff = clampf(params_.filter_cutoff, 0.0f, 1.0f);
     params_.filter_resonance = clampf(params_.filter_resonance, 0.0f, 1.0f);
     params_.lpg_decay = clampf(params_.lpg_decay, 0.0f, 1.0f);
     params_.lpg_color = clampf(params_.lpg_color, 0.0f, 1.0f);
-    params_.assign1_target = clampi(params_.assign1_target, PPF_ASSIGN_NONE, PPF_ASSIGN_PAN);
-    params_.assign2_target = clampi(params_.assign2_target, PPF_ASSIGN_NONE, PPF_ASSIGN_PAN);
+    params_.assign1_target = clampi(params_.assign1_target, PPF_ASSIGN_NONE, PPF_ASSIGN_SPREAD);
+    params_.assign2_target = clampi(params_.assign2_target, PPF_ASSIGN_NONE, PPF_ASSIGN_SPREAD);
     params_.polyphony = clampi(params_.polyphony, 1, PPF_MAX_VOICES);
     params_.unison = clampi(params_.unison, 1, PPF_MAX_VOICES);
     params_.voice_mode = clampi(params_.voice_mode, 0, 2);
@@ -593,7 +602,7 @@ void ppf_engine_t::note_on(int note, float velocity) {
                 pan = ((float)i / (float)(unison - 1)) * 2.0f - 1.0f;
                 pan *= params_.spread;
             }
-            impl_->trigger_voice(impl_->voices[i], note, velocity, detune, pan, retrig);
+            impl_->trigger_voice(impl_->voices[i], note, i, velocity, detune, pan, retrig);
             impl_->voices[i].last_lpg_decay = params_.lpg_decay;
         }
         for (int i = unison; i < budget; ++i) {
@@ -650,7 +659,7 @@ void ppf_engine_t::note_on(int note, float velocity) {
             pan = ((float)i / (float)(unison - 1)) * 2.0f - 1.0f;
             pan *= params_.spread;
         }
-        impl_->trigger_voice(impl_->voices[idx], note, velocity, detune, pan, params_.env_retrig != 0);
+        impl_->trigger_voice(impl_->voices[idx], note, i, velocity, detune, pan, params_.env_retrig != 0);
         impl_->voices[idx].last_lpg_decay = params_.lpg_decay;
     }
 }
@@ -840,8 +849,10 @@ void ppf_engine_t::render(float *out_l, float *out_r, int frames) {
             float fm_amount = params_.fm_amount;
             float lpg = params_.lpg_decay;
             float lpg_color = params_.lpg_color;
-            float volume = 1.0f;
-            float pan = v.pan;
+            float volume = params_.volume;
+            float pan_offset = params_.pan;
+            float detune = params_.detune;
+            float spread = params_.spread;
 
             cutoff_mod_sum += ppf_modulation_sum(src, params_.cutoff_mod);
             ++cutoff_mod_count;
@@ -879,7 +890,13 @@ void ppf_engine_t::render(float *out_l, float *out_r, int frames) {
                         volume += amount;
                         break;
                     case PPF_ASSIGN_PAN:
-                        pan += amount;
+                        pan_offset += amount;
+                        break;
+                    case PPF_ASSIGN_DETUNE:
+                        detune += amount;
+                        break;
+                    case PPF_ASSIGN_SPREAD:
+                        spread += amount;
                         break;
                     case PPF_ASSIGN_NONE:
                     default:
@@ -898,7 +915,23 @@ void ppf_engine_t::render(float *out_l, float *out_r, int frames) {
             lpg = clampf(lpg, 0.0f, 1.0f);
             lpg_color = clampf(lpg_color, 0.0f, 1.0f);
             volume = clampf(volume, 0.0f, 2.0f);
-            pan = clampf(pan, -1.0f, 1.0f);
+            pan_offset = clampf(pan_offset, -1.0f, 1.0f);
+            detune = clampf(detune, 0.0f, 1.0f);
+            spread = clampf(spread, 0.0f, 1.0f);
+
+            int unison = clampi(params_.unison, 1, budget);
+            int slot = clampi(v.unison_slot, 0, unison - 1);
+            float center = 0.5f * (float)(unison - 1);
+            float detune_units = ((float)slot - center);
+            float detune_offset = detune_units * detune * 0.6f;
+            float spread_pan = 0.0f;
+            if (unison > 1) {
+                spread_pan = ((float)slot / (float)(unison - 1)) * 2.0f - 1.0f;
+                spread_pan *= spread;
+            }
+            v.note_target = (float)v.note + detune_offset;
+            float pan = clampf(spread_pan + pan_offset, -1.0f, 1.0f);
+            v.pan_current = pan;
             v.last_lpg_decay = lpg;
 
             plaits::Patch patch{};
@@ -920,12 +953,8 @@ void ppf_engine_t::render(float *out_l, float *out_r, int frames) {
             mods.harmonics = 0.0f;
             mods.timbre = 0.0f;
             mods.morph = 0.0f;
-            float release_level = v.gate ? 1.0f : 0.0f;
-            if (!v.gate && v.release_samples_total > 0) {
-                release_level = clampf((float)v.release_samples_remaining / (float)v.release_samples_total, 0.0f, 1.0f);
-            }
             mods.trigger = (v.trigger_blocks > 0) ? 1.0f : 0.0f;
-            mods.level = clampf(v.velocity, 0.0f, 1.0f) * release_level * volume;
+            mods.level = clampf(v.velocity, 0.0f, 1.0f) * (v.gate ? 1.0f : 0.0f) * volume;
             mods.frequency_patched = false;
             mods.timbre_patched = false;
             mods.morph_patched = false;
@@ -1012,6 +1041,20 @@ int ppf_engine_t::debug_voice_active_engine(int voice_index) const {
     const VoiceState &v = impl_->voices[voice_index];
     if (!v.active) return -1;
     return v.synth.active_engine();
+}
+
+float ppf_engine_t::debug_voice_note_target(int voice_index) const {
+    int budget = impl_->active_voice_budget(params_);
+    if (voice_index < 0 || voice_index >= budget) return 0.0f;
+    const VoiceState &v = impl_->voices[voice_index];
+    return v.note_target;
+}
+
+float ppf_engine_t::debug_voice_pan(int voice_index) const {
+    int budget = impl_->active_voice_budget(params_);
+    if (voice_index < 0 || voice_index >= budget) return 0.0f;
+    const VoiceState &v = impl_->voices[voice_index];
+    return v.pan_current;
 }
 
 int ppf_engine_t::debug_release_samples_total_for_note(int note) const {

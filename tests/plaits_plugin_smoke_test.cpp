@@ -67,6 +67,8 @@ int main() {
     api->set_param(inst, "morph", "0.7");
     api->set_param(inst, "fm_amount", "0.2");
     api->set_param(inst, "aux_mix", "0.5");
+    api->set_param(inst, "volume", "0.82");
+    api->set_param(inst, "pan", "-0.31");
     api->set_param(inst, "voice_mode", "poly");
     api->set_param(inst, "lfo_shape", "saw");
     api->set_param(inst, "filter_mode", "bp");
@@ -176,7 +178,47 @@ int main() {
         fail("aux_mix should roundtrip as float amount");
     }
 
+    char volume_buf[32];
+    memset(volume_buf, 0, sizeof(volume_buf));
+    if (api->get_param(inst, "volume", volume_buf, (int)sizeof(volume_buf)) < 0) {
+        fail("get_param(volume) failed");
+    }
+    if (strcmp(volume_buf, "0.82") != 0) {
+        fail("volume should roundtrip as float amount");
+    }
+
+    char pan_buf[32];
+    memset(pan_buf, 0, sizeof(pan_buf));
+    if (api->get_param(inst, "pan", pan_buf, (int)sizeof(pan_buf)) < 0) {
+        fail("get_param(pan) failed");
+    }
+    if (strcmp(pan_buf, "-0.31") != 0) {
+        fail("pan should roundtrip as float amount");
+    }
+
     char assign_target_buf[32];
+    char assign2_target_buf[32];
+
+    api->set_param(inst, "assign1_target", "detune");
+    memset(assign_target_buf, 0, sizeof(assign_target_buf));
+    if (api->get_param(inst, "assign1_target", assign_target_buf, (int)sizeof(assign_target_buf)) < 0) {
+        fail("get_param(assign1_target) failed for detune");
+    }
+    if (strcmp(assign_target_buf, "detune") != 0) {
+        fail("assign1_target should support detune target");
+    }
+    api->set_param(inst, "assign1_target", "morph");
+
+    api->set_param(inst, "assign2_target", "spread");
+    memset(assign2_target_buf, 0, sizeof(assign2_target_buf));
+    if (api->get_param(inst, "assign2_target", assign2_target_buf, (int)sizeof(assign2_target_buf)) < 0) {
+        fail("get_param(assign2_target) failed for spread");
+    }
+    if (strcmp(assign2_target_buf, "spread") != 0) {
+        fail("assign2_target should support spread target");
+    }
+    api->set_param(inst, "assign2_target", "pan");
+
     memset(assign_target_buf, 0, sizeof(assign_target_buf));
     if (api->get_param(inst, "assign1_target", assign_target_buf, (int)sizeof(assign_target_buf)) < 0) {
         fail("get_param(assign1_target) failed");
@@ -185,7 +227,6 @@ int main() {
         fail("assign1_target should return enum text");
     }
 
-    char assign2_target_buf[32];
     memset(assign2_target_buf, 0, sizeof(assign2_target_buf));
     if (api->get_param(inst, "assign2_target", assign2_target_buf, (int)sizeof(assign2_target_buf)) < 0) {
         fail("get_param(assign2_target) failed");
@@ -362,6 +403,24 @@ int main() {
     }
     if (strcmp(restored_aux_mix_buf, "0.5") != 0) {
         fail("state restore via json_defaults should restore aux_mix");
+    }
+
+    char restored_volume_buf[32];
+    memset(restored_volume_buf, 0, sizeof(restored_volume_buf));
+    if (api->get_param(inst_from_state, "volume", restored_volume_buf, (int)sizeof(restored_volume_buf)) < 0) {
+        fail("get_param(volume) failed on restored instance");
+    }
+    if (strcmp(restored_volume_buf, "0.82") != 0) {
+        fail("state restore via json_defaults should restore volume");
+    }
+
+    char restored_pan_buf[32];
+    memset(restored_pan_buf, 0, sizeof(restored_pan_buf));
+    if (api->get_param(inst_from_state, "pan", restored_pan_buf, (int)sizeof(restored_pan_buf)) < 0) {
+        fail("get_param(pan) failed on restored instance");
+    }
+    if (strcmp(restored_pan_buf, "-0.31") != 0) {
+        fail("state restore via json_defaults should restore pan");
     }
 
     uint8_t note_on[] = {0x90, 60, 100};

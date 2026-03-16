@@ -138,7 +138,9 @@ static const char *const kAssignTargetNames[] = {
     "timbre",
     "filter_cutoff",
     "volume",
-    "pan"
+    "pan",
+    "detune",
+    "spread"
 };
 constexpr int kAssignTargetCount = (int)(sizeof(kAssignTargetNames) / sizeof(kAssignTargetNames[0]));
 static const float kSyncReferenceBpm = 120.0f;
@@ -510,6 +512,8 @@ static const char *const kStateKeys[] = {
     "morph",
     "fm_amount",
     "aux_mix",
+    "volume",
+    "pan",
     "filter_mode",
     "filter_cutoff",
     "filter_resonance",
@@ -702,6 +706,8 @@ static int set_param_internal(freak_instance_t *inst, const char *key, const cha
     SET_FLOAT_FIELD("morph", morph, 0.0f, 1.0f);
     SET_FLOAT_FIELD("fm_amount", fm_amount, 0.0f, 1.0f);
     SET_FLOAT_FIELD("aux_mix", aux_mix, 0.0f, 1.0f);
+    SET_FLOAT_FIELD("volume", volume, 0.0f, 2.0f);
+    SET_FLOAT_FIELD("pan", pan, -1.0f, 1.0f);
     SET_INT_FIELD("filter_mode", filter_mode, 0, 2);
     SET_FLOAT_FIELD("filter_cutoff", filter_cutoff, 0.0f, 1.0f);
     SET_FLOAT_FIELD("filter_resonance", filter_resonance, 0.0f, 1.0f);
@@ -814,6 +820,8 @@ static int get_param_internal(const freak_instance_t *inst, const char *key, cha
     GET_FLOAT_FIELD("morph", morph);
     GET_FLOAT_FIELD("fm_amount", fm_amount);
     GET_FLOAT_FIELD("aux_mix", aux_mix);
+    GET_FLOAT_FIELD("volume", volume);
+    GET_FLOAT_FIELD("pan", pan);
     GET_ENUM_FIELD("filter_mode", filter_mode);
     GET_FLOAT_FIELD("filter_cutoff", filter_cutoff);
     GET_FLOAT_FIELD("filter_resonance", filter_resonance);

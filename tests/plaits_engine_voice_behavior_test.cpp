@@ -38,6 +38,11 @@ static float render_peak(ppf_engine_t &engine, int frames, int block) {
     return peak;
 }
 
+static float render_peak_after_skip(ppf_engine_t &engine, int skip_frames, int measure_frames, int block) {
+    render_some(engine, skip_frames, block);
+    return render_peak(engine, measure_frames, block);
+}
+
 int main() {
     ppf_engine_t engine;
     ppf_params_t params;
@@ -121,6 +126,46 @@ int main() {
         fail("mono-legato note changes should move the full unison stack");
     }
 
+    ppf_engine_t live_detune_engine;
+    ppf_params_t live_detune_params;
+    ppf_default_params(&live_detune_params);
+    live_detune_params.voice_mode = 0;  // mono
+    live_detune_params.unison = 2;
+    live_detune_params.detune = 0.0f;
+    live_detune_params.spread = 0.0f;
+    live_detune_engine.set_params(live_detune_params);
+    live_detune_engine.note_on(60, 1.0f);
+    render_some(live_detune_engine, 256, 64);
+
+    float initial_target_0 = live_detune_engine.debug_voice_note_target(0);
+    float initial_target_1 = live_detune_engine.debug_voice_note_target(1);
+    float initial_pan_0 = live_detune_engine.debug_voice_pan(0);
+    float initial_pan_1 = live_detune_engine.debug_voice_pan(1);
+
+    if (initial_target_0 != 60.0f || initial_target_1 != 60.0f) {
+        fail("detune=0 should keep unison voice targets centered on note pitch");
+    }
+    if (initial_pan_0 != 0.0f || initial_pan_1 != 0.0f) {
+        fail("spread=0 should keep unison voice pan centered");
+    }
+
+    live_detune_params.detune = 1.0f;
+    live_detune_params.spread = 1.0f;
+    live_detune_engine.set_params(live_detune_params);
+    render_some(live_detune_engine, 256, 64);
+
+    float live_target_0 = live_detune_engine.debug_voice_note_target(0);
+    float live_target_1 = live_detune_engine.debug_voice_note_target(1);
+    float live_pan_0 = live_detune_engine.debug_voice_pan(0);
+    float live_pan_1 = live_detune_engine.debug_voice_pan(1);
+
+    if (live_target_0 >= 59.95f || live_target_1 <= 60.05f) {
+        fail("detune should update live for held unison notes");
+    }
+    if (live_pan_0 >= -0.95f || live_pan_1 <= 0.95f) {
+        fail("spread should update live for held unison notes");
+    }
+
     engine.note_off(60);
     render_some(engine, PPF_SAMPLE_RATE * 8, 128);
     if (engine.debug_active_voice_count() != 0) {
@@ -157,6 +202,41 @@ int main() {
     render_some(held_engine, PPF_SAMPLE_RATE * 24, 128);
     if (held_engine.debug_active_voice_count() != 0) {
         fail("held note release should eventually finish");
+    }
+
+    ppf_engine_t short_lpg_audio_engine;
+    ppf_params_t short_lpg_audio_params;
+    ppf_default_params(&short_lpg_audio_params);
+    short_lpg_audio_params.voice_mode = 1;  // poly
+    short_lpg_audio_params.polyphony = 1;
+    short_lpg_audio_params.unison = 1;
+    short_lpg_audio_params.lpg_decay = 0.0f;
+    short_lpg_audio_engine.set_params(short_lpg_audio_params);
+    short_lpg_audio_engine.note_on(65, 1.0f);
+    render_some(short_lpg_audio_engine, PPF_SAMPLE_RATE, 128);
+    short_lpg_audio_engine.note_off(65);
+    float short_lpg_tail = render_peak_after_skip(short_lpg_audio_engine, PPF_SAMPLE_RATE / 2, 4096, 128);
+    if (short_lpg_tail > 0.02f) {
+        fail("minimum LPG decay should fade quickly after release");
+    }
+
+    ppf_engine_t long_lpg_audio_engine;
+    ppf_params_t long_lpg_audio_params;
+    ppf_default_params(&long_lpg_audio_params);
+    long_lpg_audio_params.voice_mode = 1;  // poly
+    long_lpg_audio_params.polyphony = 1;
+    long_lpg_audio_params.unison = 1;
+    long_lpg_audio_params.lpg_decay = 1.0f;
+    long_lpg_audio_engine.set_params(long_lpg_audio_params);
+    long_lpg_audio_engine.note_on(65, 1.0f);
+    render_some(long_lpg_audio_engine, PPF_SAMPLE_RATE, 128);
+    long_lpg_audio_engine.note_off(65);
+    float long_lpg_tail = render_peak_after_skip(long_lpg_audio_engine, PPF_SAMPLE_RATE / 2, 4096, 128);
+    if (long_lpg_tail < 0.02f) {
+        fail("maximum LPG decay should keep a clearly audible tail");
+    }
+    if (long_lpg_tail < short_lpg_tail * 2.0f) {
+        fail("LPG decay control should audibly change tail length");
     }
 
     ppf_engine_t release_timing_engine;

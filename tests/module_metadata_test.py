@@ -45,6 +45,8 @@ required_keys = [
     "voice_mode",
     "polyphony",
     "unison",
+    "volume",
+    "pan",
     "detune",
     "spread",
     "glide_ms",
@@ -68,9 +70,9 @@ for opt in model_opts:
         fail("model enum options should use clean labels without underscores")
 
 assign_target_opts = chain_params.get("assign1_target", {}).get("options", [])
-if len(assign_target_opts) != 12:
-    fail("assign target enum must expose 12 options")
-for option in ["off", "morph", "fm_amount", "lpg_decay", "lpg_color", "filter_resonance", "filter_cutoff", "volume", "pan"]:
+if len(assign_target_opts) != 14:
+    fail("assign target enum must expose 14 options")
+for option in ["off", "morph", "fm_amount", "lpg_decay", "lpg_color", "filter_resonance", "filter_cutoff", "volume", "pan", "detune", "spread"]:
     if option not in assign_target_opts:
         fail(f"assign target enum missing option: {option}")
 
@@ -109,8 +111,8 @@ if "Filter" not in labels:
     fail("missing root submenu: Filter")
 if "Mod Sources" not in labels:
     fail("missing root submenu: Mod Sources")
-if "Voice" not in labels:
-    fail("missing root submenu: Voice")
+if "Voice & Mix" not in labels:
+    fail("missing root submenu: Voice & Mix")
 
 for forbidden in ["Pitch Mod", "Harmonics Mod", "Timbre Mod", "Morph Mod", "FM Mod", "Color Mod", "Macros", "Init / Randomize"]:
     if forbidden in labels:
@@ -272,7 +274,7 @@ expected_submenu_knobs = {
     "random": ["random_mode", "random_rate", "random_sync", "random_slew", "random_retrig"],
     "velocity": ["velocity_curve"],
     "poly_aftertouch": ["poly_aftertouch_curve"],
-    "voice": ["voice_mode", "polyphony", "unison", "detune", "spread", "glide_ms"],
+    "voice": ["volume", "pan", "voice_mode", "polyphony", "unison", "detune", "spread", "glide_ms"],
 }
 
 for level_name, expected_knobs in expected_submenu_knobs.items():

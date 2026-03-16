@@ -48,7 +48,7 @@
               "level": "mod_sources"
             },
             {
-              "label": "Voice",
+              "label": "Voice & Mix",
               "level": "voice"
             }
           ]
@@ -356,8 +356,10 @@
           ]
         },
         "voice": {
-          "name": "Voice",
+          "name": "Voice & Mix",
           "knobs": [
+            "volume",
+            "pan",
             "voice_mode",
             "polyphony",
             "unison",
@@ -366,6 +368,8 @@
             "glide_ms"
           ],
           "params": [
+            "volume",
+            "pan",
             "voice_mode",
             "polyphony",
             "unison",
@@ -504,7 +508,9 @@
           "timbre",
           "filter_cutoff",
           "volume",
-          "pan"
+          "pan",
+          "detune",
+          "spread"
         ]
       },
       {
@@ -565,7 +571,9 @@
           "timbre",
           "filter_cutoff",
           "volume",
-          "pan"
+          "pan",
+          "detune",
+          "spread"
         ]
       },
       {
@@ -996,6 +1004,20 @@
       {
         "key": "poly_aftertouch_curve",
         "name": "Curve",
+        "type": "float",
+        "min": -1.0,
+        "max": 1.0
+      },
+      {
+        "key": "volume",
+        "name": "Volume",
+        "type": "float",
+        "min": 0.0,
+        "max": 2.0
+      },
+      {
+        "key": "pan",
+        "name": "Pan",
         "type": "float",
         "min": -1.0,
         "max": 1.0

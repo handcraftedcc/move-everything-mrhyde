@@ -11,7 +11,7 @@
         "Root menu:",
         "Main / Filter /",
         "Mod / Mod Sources",
-        "/ Voice"
+        "/ Voice & Mix"
       ]
     },
     {
@@ -71,8 +71,12 @@
       ]
     },
     {
-      "title": "Voice",
+      "title": "Voice & Mix",
       "lines": [
+        "Volume + Pan are",
+        "static mix controls",
+        "at top of page",
+        "",
         "Modes: mono,",
         "poly, mono legato",
         "Mono modes allow",

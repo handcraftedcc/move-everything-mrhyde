@@ -85,6 +85,8 @@ typedef struct {
     float morph;
     float fm_amount;
     float aux_mix;
+    float volume;
+    float pan;
     int filter_mode;
     float filter_cutoff;
     float filter_resonance;
@@ -165,6 +167,8 @@ public:
     int debug_active_voice_count() const;
     int debug_active_note_count(int note) const;
     int debug_voice_active_engine(int voice_index) const;
+    float debug_voice_note_target(int voice_index) const;
+    float debug_voice_pan(int voice_index) const;
     int debug_release_samples_total_for_note(int note) const;
 #endif
 
