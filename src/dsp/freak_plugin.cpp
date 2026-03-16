@@ -266,12 +266,14 @@ static int write_enum_text(const char *key, int value, char *buf, int buf_len) {
                strcmp(key, "assign2_target") == 0) {
         names = kAssignTargetNames;
         count = kAssignTargetCount;
-    } else if (strcmp(key, "lfo_sync") == 0 ||
+    } else if (strcmp(key, "lfo_rate_mode") == 0 ||
+               strcmp(key, "lfo_sync") == 0 ||
                strcmp(key, "lfo_retrig") == 0 ||
                strcmp(key, "env_retrig") == 0 ||
                strcmp(key, "cycle_sync") == 0 ||
                strcmp(key, "cycle_retrig") == 0 ||
                strcmp(key, "cycle_bipolar") == 0 ||
+               strcmp(key, "random_rate_mode") == 0 ||
                strcmp(key, "random_sync") == 0 ||
                strcmp(key, "random_retrig") == 0) {
         names = kOnOffNames;
@@ -679,7 +681,7 @@ static const char *const kStateKeys[] = {
     "assign2_mod_poly_aftertouch_amt",
     "lfo_shape",
     "lfo_rate",
-    "lfo_sync",
+    "lfo_rate_mode",
     "lfo_retrig",
     "lfo_phase",
     "env_attack_ms",
@@ -695,7 +697,7 @@ static const char *const kStateKeys[] = {
     "cycle_bipolar",
     "random_mode",
     "random_rate",
-    "random_sync",
+    "random_rate_mode",
     "random_slew",
     "random_retrig",
     "velocity_curve",
@@ -775,7 +777,7 @@ static int set_param_internal(freak_instance_t *inst, const char *key, const cha
             inst->params.random_rate = sync_rate_hz_from_index(iv, kSyncReferenceBpm);
             return 1;
         }
-        if (strcmp(key, "lfo_sync") == 0) {
+        if (strcmp(key, "lfo_rate_mode") == 0 || strcmp(key, "lfo_sync") == 0) {
             if (!parse_boolish(val, &iv)) return 0;
             inst->params.lfo_sync = iv;
             return 1;
@@ -805,7 +807,7 @@ static int set_param_internal(freak_instance_t *inst, const char *key, const cha
             inst->params.cycle_bipolar = iv;
             return 1;
         }
-        if (strcmp(key, "random_sync") == 0) {
+        if (strcmp(key, "random_rate_mode") == 0 || strcmp(key, "random_sync") == 0) {
             if (!parse_boolish(val, &iv)) return 0;
             inst->params.random_sync = iv;
             return 1;
@@ -889,7 +891,10 @@ static int set_param_internal(freak_instance_t *inst, const char *key, const cha
         inst->params.lfo_rate = hz;
         return 1;
     }
-    SET_INT_FIELD("lfo_sync", lfo_sync, 0, 1);
+    if (strcmp(key, "lfo_rate_mode") == 0 || strcmp(key, "lfo_sync") == 0) {
+        inst->params.lfo_sync = clampi(iv, 0, 1);
+        return 1;
+    }
     SET_INT_FIELD("lfo_retrig", lfo_retrig, 0, 1);
     SET_FLOAT_FIELD("lfo_phase", lfo_phase, 0.0f, 1.0f);
 
@@ -917,7 +922,10 @@ static int set_param_internal(freak_instance_t *inst, const char *key, const cha
         inst->params.random_rate = hz;
         return 1;
     }
-    SET_INT_FIELD("random_sync", random_sync, 0, 1);
+    if (strcmp(key, "random_rate_mode") == 0 || strcmp(key, "random_sync") == 0) {
+        inst->params.random_sync = clampi(iv, 0, 1);
+        return 1;
+    }
     SET_FLOAT_FIELD("random_slew", random_slew, 0.0f, 1.0f);
     SET_INT_FIELD("random_retrig", random_retrig, 0, 1);
 
@@ -1007,7 +1015,7 @@ static int get_param_internal(const freak_instance_t *inst, const char *key, cha
         }
         return snprintf(buf, buf_len, "%.6g", clampf(inst->params.lfo_rate, 0.01f, 40.0f));
     }
-    if (strcmp(key, "lfo_sync") == 0) {
+    if (strcmp(key, "lfo_rate_mode") == 0 || strcmp(key, "lfo_sync") == 0) {
         return write_rate_mode_text(inst->params.lfo_sync, buf, buf_len);
     }
     GET_ENUM_FIELD("lfo_retrig", lfo_retrig);
@@ -1033,7 +1041,7 @@ static int get_param_internal(const freak_instance_t *inst, const char *key, cha
         }
         return snprintf(buf, buf_len, "%.6g", clampf(inst->params.random_rate, 0.01f, 40.0f));
     }
-    if (strcmp(key, "random_sync") == 0) {
+    if (strcmp(key, "random_rate_mode") == 0 || strcmp(key, "random_sync") == 0) {
         return write_rate_mode_text(inst->params.random_sync, buf, buf_len);
     }
     GET_FLOAT_FIELD("random_slew", random_slew);

@@ -253,7 +253,7 @@ int main() {
         fail("cycle_attack_ms should clamp to integer minimum of 1ms");
     }
 
-    api->set_param(inst, "lfo_sync", "off");
+    api->set_param(inst, "lfo_rate_mode", "off");
     api->set_param(inst, "lfo_rate", "3.5");
     char lfo_rate_buf[32];
     memset(lfo_rate_buf, 0, sizeof(lfo_rate_buf));
@@ -264,17 +264,17 @@ int main() {
         fail("lfo_rate should return free numeric Hz value when sync is off");
     }
 
-    api->set_param(inst, "lfo_sync", "sync");
+    api->set_param(inst, "lfo_rate_mode", "sync");
     char err_buf[256];
     memset(err_buf, 0, sizeof(err_buf));
     if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
-        fail("get_error failed after lfo_sync=sync");
+        fail("get_error failed after lfo_rate_mode=sync");
     }
     if (err_buf[0] != '\0') {
-        fail("lfo_sync should accept paramlfo-style sync text");
+        fail("lfo_rate_mode should accept paramlfo-style sync text");
     }
 
-    api->set_param(inst, "lfo_sync", "on");
+    api->set_param(inst, "lfo_rate_mode", "on");
     api->set_param(inst, "lfo_rate", "1/8");
     memset(lfo_rate_buf, 0, sizeof(lfo_rate_buf));
     if (api->get_param(inst, "lfo_rate", lfo_rate_buf, (int)sizeof(lfo_rate_buf)) < 0) {
@@ -293,7 +293,7 @@ int main() {
         fail("lfo_rate should accept and return synced fraction labels");
     }
 
-    api->set_param(inst, "lfo_sync", "off");
+    api->set_param(inst, "lfo_rate_mode", "off");
     api->set_param(inst, "lfo_rate", "1/4");
     memset(err_buf, 0, sizeof(err_buf));
     if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
@@ -310,16 +310,16 @@ int main() {
         fail("lfo_rate should report numeric Hz in free mode");
     }
 
-    api->set_param(inst, "lfo_sync", "free");
+    api->set_param(inst, "lfo_rate_mode", "free");
     memset(err_buf, 0, sizeof(err_buf));
     if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
-        fail("get_error failed after lfo_sync=free");
+        fail("get_error failed after lfo_rate_mode=free");
     }
     if (err_buf[0] != '\0') {
-        fail("lfo_sync should accept paramlfo-style free text");
+        fail("lfo_rate_mode should accept paramlfo-style free text");
     }
 
-    api->set_param(inst, "random_sync", "off");
+    api->set_param(inst, "random_rate_mode", "off");
     api->set_param(inst, "random_rate", "5.25");
     char random_rate_buf[32];
     memset(random_rate_buf, 0, sizeof(random_rate_buf));
@@ -330,16 +330,16 @@ int main() {
         fail("random_rate should return free numeric Hz value when sync is off");
     }
 
-    api->set_param(inst, "random_sync", "sync");
+    api->set_param(inst, "random_rate_mode", "sync");
     memset(err_buf, 0, sizeof(err_buf));
     if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
-        fail("get_error failed after random_sync=sync");
+        fail("get_error failed after random_rate_mode=sync");
     }
     if (err_buf[0] != '\0') {
-        fail("random_sync should accept paramlfo-style sync text");
+        fail("random_rate_mode should accept paramlfo-style sync text");
     }
 
-    api->set_param(inst, "random_sync", "on");
+    api->set_param(inst, "random_rate_mode", "on");
     api->set_param(inst, "random_rate", "1/8");
     memset(random_rate_buf, 0, sizeof(random_rate_buf));
     if (api->get_param(inst, "random_rate", random_rate_buf, (int)sizeof(random_rate_buf)) < 0) {
@@ -358,7 +358,7 @@ int main() {
         fail("random_rate should accept and return synced fraction labels");
     }
 
-    api->set_param(inst, "random_sync", "off");
+    api->set_param(inst, "random_rate_mode", "off");
     api->set_param(inst, "random_rate", "1/4");
     memset(err_buf, 0, sizeof(err_buf));
     if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
@@ -375,13 +375,13 @@ int main() {
         fail("random_rate should report numeric Hz in free mode");
     }
 
-    api->set_param(inst, "random_sync", "free");
+    api->set_param(inst, "random_rate_mode", "free");
     memset(err_buf, 0, sizeof(err_buf));
     if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
-        fail("get_error failed after random_sync=free");
+        fail("get_error failed after random_rate_mode=free");
     }
     if (err_buf[0] != '\0') {
-        fail("random_sync should accept paramlfo-style free text");
+        fail("random_rate_mode should accept paramlfo-style free text");
     }
 
     char hierarchy_buf[32768];
@@ -421,8 +421,8 @@ int main() {
     }
 
     char chain_params_buf[16384];
-    api->set_param(inst, "lfo_sync", "on");
-    api->set_param(inst, "random_sync", "on");
+    api->set_param(inst, "lfo_rate_mode", "on");
+    api->set_param(inst, "random_rate_mode", "on");
     memset(chain_params_buf, 0, sizeof(chain_params_buf));
     if (api->get_param(inst, "chain_params", chain_params_buf, (int)sizeof(chain_params_buf)) <= 0) {
         fail("chain_params get_param returned empty");
@@ -431,23 +431,23 @@ int main() {
         fail("chain_params should be a JSON array");
     }
     if (strstr(chain_params_buf, "\"key\":\"lfo_rate\",\"name\":\"Rate\",\"type\":\"enum\"") == NULL) {
-        fail("chain_params should expose lfo_rate as enum when lfo_sync is on");
+        fail("chain_params should expose lfo_rate as enum when lfo_rate_mode is on");
     }
     if (strstr(chain_params_buf, "\"key\":\"random_rate\",\"name\":\"Rate\",\"type\":\"enum\"") == NULL) {
-        fail("chain_params should expose random_rate as enum when random_sync is on");
+        fail("chain_params should expose random_rate as enum when random_rate_mode is on");
     }
 
-    api->set_param(inst, "lfo_sync", "off");
-    api->set_param(inst, "random_sync", "off");
+    api->set_param(inst, "lfo_rate_mode", "off");
+    api->set_param(inst, "random_rate_mode", "off");
     memset(chain_params_buf, 0, sizeof(chain_params_buf));
     if (api->get_param(inst, "chain_params", chain_params_buf, (int)sizeof(chain_params_buf)) <= 0) {
         fail("chain_params get_param returned empty after sync off");
     }
     if (strstr(chain_params_buf, "\"key\":\"lfo_rate\",\"name\":\"Rate\",\"type\":\"float\"") == NULL) {
-        fail("chain_params should expose lfo_rate as float when lfo_sync is off");
+        fail("chain_params should expose lfo_rate as float when lfo_rate_mode is off");
     }
     if (strstr(chain_params_buf, "\"key\":\"random_rate\",\"name\":\"Rate\",\"type\":\"float\"") == NULL) {
-        fail("chain_params should expose random_rate as float when random_sync is off");
+        fail("chain_params should expose random_rate as float when random_rate_mode is off");
     }
 
     char state_buf[16384];

@@ -50,6 +50,8 @@ required_keys = [
     "detune",
     "spread",
     "glide_ms",
+    "lfo_rate_mode",
+    "random_rate_mode",
 ]
 for key in required_keys:
     if key not in chain_params:
@@ -228,6 +230,17 @@ if lfo_rate_meta.get("min") != 0.01 or lfo_rate_meta.get("max") != 40.0:
 if random_rate_meta.get("min") != 0.01 or random_rate_meta.get("max") != 40.0:
     fail("random_rate range must be 0.01..40.0 Hz")
 
+for mode_key in ["lfo_rate_mode", "random_rate_mode"]:
+    mode_meta = chain_params.get(mode_key, {})
+    if mode_meta.get("type") != "enum":
+        fail(f"{mode_key} must be enum")
+    if mode_meta.get("options") != ["free", "sync"]:
+        fail(f"{mode_key} options must be ['free', 'sync']")
+
+for legacy_mode_key in ["lfo_sync", "random_sync"]:
+    if legacy_mode_key in chain_params:
+        fail(f"legacy mode key should not be exposed: {legacy_mode_key}")
+
 poly_at_curve_meta = chain_params.get("poly_aftertouch_curve", {})
 if poly_at_curve_meta.get("type") != "float":
     fail("poly_aftertouch_curve must be float")
@@ -266,10 +279,10 @@ expected_submenu_knobs = {
     "harmonics_mod": ["harmonics_mod_lfo_amt", "harmonics_mod_env_amt", "harmonics_mod_cycle_env_amt", "harmonics_mod_random_amt", "harmonics_mod_velocity_amt", "harmonics_mod_poly_aftertouch_amt"],
     "timbre_mod": ["timbre_mod_lfo_amt", "timbre_mod_env_amt", "timbre_mod_cycle_env_amt", "timbre_mod_random_amt", "timbre_mod_velocity_amt", "timbre_mod_poly_aftertouch_amt"],
     "cutoff_mod": ["cutoff_mod_lfo_amt", "cutoff_mod_env_amt", "cutoff_mod_cycle_env_amt", "cutoff_mod_random_amt", "cutoff_mod_velocity_amt", "cutoff_mod_poly_aftertouch_amt"],
-    "lfo": ["lfo_shape", "lfo_rate", "lfo_sync", "lfo_retrig", "lfo_phase"],
+    "lfo": ["lfo_shape", "lfo_rate", "lfo_rate_mode", "lfo_retrig", "lfo_phase"],
     "envelope": ["env_attack_ms", "env_decay_ms", "env_sustain", "env_release_ms", "env_retrig"],
     "cycle_env": ["cycle_attack_ms", "cycle_decay_ms", "cycle_shape", "cycle_sync", "cycle_retrig", "cycle_bipolar"],
-    "random": ["random_mode", "random_rate", "random_sync", "random_slew", "random_retrig"],
+    "random": ["random_mode", "random_rate", "random_rate_mode", "random_slew", "random_retrig"],
     "velocity": ["velocity_curve"],
     "poly_aftertouch": ["poly_aftertouch_curve"],
     "voice": ["volume", "pan", "voice_mode", "polyphony", "unison", "detune", "spread", "glide_ms"],

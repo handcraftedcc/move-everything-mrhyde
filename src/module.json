@@ -272,14 +272,14 @@
           "knobs": [
             "lfo_shape",
             "lfo_rate",
-            "lfo_sync",
+            "lfo_rate_mode",
             "lfo_retrig",
             "lfo_phase"
           ],
           "params": [
             "lfo_shape",
             "lfo_rate",
-            "lfo_sync",
+            "lfo_rate_mode",
             "lfo_retrig",
             "lfo_phase"
           ]
@@ -325,14 +325,14 @@
           "knobs": [
             "random_mode",
             "random_rate",
-            "random_sync",
+            "random_rate_mode",
             "random_slew",
             "random_retrig"
           ],
           "params": [
             "random_mode",
             "random_rate",
-            "random_sync",
+            "random_rate_mode",
             "random_slew",
             "random_retrig"
           ]
@@ -813,7 +813,7 @@
         "max": 40.0
       },
       {
-        "key": "lfo_sync",
+        "key": "lfo_rate_mode",
         "name": "Sync",
         "type": "enum",
         "options": [
@@ -948,7 +948,7 @@
         "max": 40.0
       },
       {
-        "key": "random_sync",
+        "key": "random_rate_mode",
         "name": "Sync",
         "type": "enum",
         "options": [
