@@ -357,11 +357,35 @@ static int extract_json_value(const char *json,
         if (c == closer) {
             depth--;
             if (depth == 0) {
-                int len = (int)(pos - start);
-                if (len >= out_len) return -1;
-                memcpy(out, start, (size_t)len);
-                out[len] = '\0';
-                return len;
+                int write_i = 0;
+                int compact_in_string = 0;
+                int compact_escaped = 0;
+                for (const char *p = start; p < pos; ++p) {
+                    char cc = *p;
+                    if (compact_in_string) {
+                        if (write_i >= out_len - 1) return -1;
+                        out[write_i++] = cc;
+                        if (compact_escaped) {
+                            compact_escaped = 0;
+                        } else if (cc == '\\') {
+                            compact_escaped = 1;
+                        } else if (cc == '"') {
+                            compact_in_string = 0;
+                        }
+                        continue;
+                    }
+                    if (cc == '"') {
+                        compact_in_string = 1;
+                        if (write_i >= out_len - 1) return -1;
+                        out[write_i++] = cc;
+                        continue;
+                    }
+                    if (isspace((unsigned char)cc)) continue;
+                    if (write_i >= out_len - 1) return -1;
+                    out[write_i++] = cc;
+                }
+                out[write_i] = '\0';
+                return write_i;
             }
         }
     }

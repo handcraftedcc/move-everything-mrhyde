@@ -479,6 +479,27 @@ int main() {
         fail("chain_params should expose random_rate_sync enum parameter");
     }
 
+    // Host-side metadata buffers are limited; plugin metadata must fit without truncation.
+    char small_chain_params_buf[8192];
+    memset(small_chain_params_buf, 0, sizeof(small_chain_params_buf));
+    int small_chain_len = api->get_param(inst, "chain_params", small_chain_params_buf, (int)sizeof(small_chain_params_buf));
+    if (small_chain_len <= 0) {
+        fail("chain_params must fit in 8k metadata buffer");
+    }
+    if (small_chain_params_buf[0] != '[' || small_chain_params_buf[small_chain_len - 1] != ']') {
+        fail("chain_params in 8k buffer must remain a complete JSON array");
+    }
+
+    char small_hierarchy_buf[8192];
+    memset(small_hierarchy_buf, 0, sizeof(small_hierarchy_buf));
+    int small_hierarchy_len = api->get_param(inst, "ui_hierarchy", small_hierarchy_buf, (int)sizeof(small_hierarchy_buf));
+    if (small_hierarchy_len <= 0) {
+        fail("ui_hierarchy must fit in 8k metadata buffer");
+    }
+    if (small_hierarchy_buf[0] != '{' || small_hierarchy_buf[small_hierarchy_len - 1] != '}') {
+        fail("ui_hierarchy in 8k buffer must remain a complete JSON object");
+    }
+
     char state_buf[16384];
     memset(state_buf, 0, sizeof(state_buf));
     if (api->get_param(inst, "state", state_buf, (int)sizeof(state_buf)) <= 0) {
