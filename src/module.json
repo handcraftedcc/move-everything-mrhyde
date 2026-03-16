@@ -270,16 +270,16 @@
         "lfo": {
           "name": "LFO",
           "knobs": [
-            "lfo_shape",
             "lfo_sync",
+            "lfo_shape",
             "lfo_rate",
             "lfo_rate_sync",
             "lfo_retrig",
             "lfo_phase"
           ],
           "params": [
-            "lfo_shape",
             "lfo_sync",
+            "lfo_shape",
             "lfo_rate",
             "lfo_rate_sync",
             "lfo_retrig",
@@ -798,7 +798,7 @@
       },
       {
         "key": "lfo_sync",
-        "name": "Rate Mode",
+        "name": "Mode",
         "type": "enum",
         "options": [
           "free",

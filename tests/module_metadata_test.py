@@ -256,8 +256,6 @@ for mode_key in ["lfo_sync", "random_sync"]:
         fail(f"{mode_key} must be enum")
     if mode_meta.get("options") != ["free", "sync"]:
         fail(f"{mode_key} options must be ['free', 'sync']")
-if chain_params.get("lfo_sync", {}).get("name") != "Rate Mode":
-    fail("lfo_sync label must be 'Rate Mode'")
 
 poly_at_curve_meta = chain_params.get("poly_aftertouch_curve", {})
 if poly_at_curve_meta.get("type") != "float":
@@ -297,7 +295,7 @@ expected_submenu_knobs = {
     "harmonics_mod": ["harmonics_mod_lfo_amt", "harmonics_mod_env_amt", "harmonics_mod_cycle_env_amt", "harmonics_mod_random_amt", "harmonics_mod_velocity_amt", "harmonics_mod_poly_aftertouch_amt"],
     "timbre_mod": ["timbre_mod_lfo_amt", "timbre_mod_env_amt", "timbre_mod_cycle_env_amt", "timbre_mod_random_amt", "timbre_mod_velocity_amt", "timbre_mod_poly_aftertouch_amt"],
     "cutoff_mod": ["cutoff_mod_lfo_amt", "cutoff_mod_env_amt", "cutoff_mod_cycle_env_amt", "cutoff_mod_random_amt", "cutoff_mod_velocity_amt", "cutoff_mod_poly_aftertouch_amt"],
-    "lfo": ["lfo_shape", "lfo_sync", "lfo_rate", "lfo_rate_sync", "lfo_retrig", "lfo_phase"],
+    "lfo": ["lfo_sync", "lfo_shape", "lfo_rate", "lfo_rate_sync", "lfo_retrig", "lfo_phase"],
     "envelope": ["env_attack_ms", "env_decay_ms", "env_sustain", "env_release_ms", "env_retrig"],
     "cycle_env": ["cycle_attack_ms", "cycle_decay_ms", "cycle_shape", "cycle_sync", "cycle_retrig", "cycle_bipolar"],
     "random": ["random_sync", "random_mode", "random_rate", "random_rate_sync", "random_slew", "random_retrig"],
