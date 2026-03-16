@@ -5,13 +5,28 @@
 ## Highlights
 
 - Uses vendored upstream `plaits` + `stmlib` as synthesis core
-- Direct top-level Plaits params (`Pitch`, `Harmonics`, `Timbre`, `Morph`, `FM Amount`)
+- `Main` submenu for core macro params (`Model`, `Pitch`, `Harmonics`, `Timbre`, `Morph`, `FM Amount`, `LPG Decay`, `LPG Color`)
 - Single `Mod` submenu with pages for `Pitch`, `Harmonics`, `Timbre`, `Cutoff`, `Assign 1`, and `Assign 2`
 - Full destination-based modulation sources:
   - LFO, Envelope, Cycling Envelope, Random, Velocity, Poly Aftertouch
 - Global multimode post filter submenu (`LP/BP/HP`, `Cutoff`, `Resonance`)
 - Voice controls: mono/poly/mono legato, polyphony, unison, detune, spread, glide
-- Top-level LPG controls (`Decay`, `Color`) and active-mod page star indicators in UI
+- Mono + mono-legato support unison stacks (single-note behavior, no chords)
+- Active modulation pages are marked with `*` in the `Mod` submenu
+
+## UI Map
+
+Root levels:
+
+- `Main`
+- `Filter`
+- `Mod`
+- `Mod Sources`
+- `Voice`
+
+Root knob mapping stays fixed to:
+
+- `model`, `harmonics`, `timbre`, `morph`, `fm_amount`, `lpg_decay`, `lpg_color`, `filter_cutoff`
 
 ## Layout
 
@@ -53,10 +68,7 @@ Install target:
 Run checks before building/releasing:
 
 ```bash
-bash tests/plaits_vendor_layout_test.sh
-g++ -std=c++14 -Isrc/dsp tests/plaits_mod_matrix_test.cpp -o /tmp/plaits_mod_matrix_test && /tmp/plaits_mod_matrix_test
-bash tests/run_plaits_plugin_smoke.sh
-python3 tests/module_metadata_test.py
+bash tests/run_all.sh
 ```
 
 ## Licensing

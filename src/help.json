@@ -8,96 +8,88 @@
         "Plaits-based synth",
         "for Move Anything.",
         "",
-        "Core controls are",
-        "top-level params",
-        "with a single Mod",
-        "submenu."
+        "Root menu:",
+        "Main / Filter /",
+        "Mod / Mod Sources",
+        "/ Voice"
       ]
     },
     {
-      "title": "Engine",
+      "title": "Main",
       "lines": [
-        "Model: Plaits",
-        "engine name",
-        "Harmonics: macro",
-        "Timbre: macro",
-        "Morph: macro",
-        "FM Amount: depth",
+        "Model: engine",
+        "selection",
         "Pitch: semitone",
-        "offset"
-      ]
-    },
-    {
-      "title": "LPG",
-      "lines": [
-        "Decay: vactrol",
-        "response time",
-        "Color: amp/filter",
-        "balance",
-        "long decay keeps",
-        "release tails",
-        "alive until fully",
-        "finished"
+        "offset (+/-48)",
+        "Harmonics, Timbre,",
+        "Morph, FM Amount",
+        "LPG Decay, Color",
+        "all on Main page"
       ]
     },
     {
       "title": "Filter",
       "lines": [
-        "Global multimode",
-        "post filter",
+        "Global post filter",
         "Mode: LP/BP/HP",
-        "Cutoff: 0..1",
-        "Resonance: amt",
-        "sits above Mod",
-        "Sources in root",
-        "layout"
+        "Cutoff +",
+        "Resonance",
+        "",
+        "Cutoff is also",
+        "mapped to root",
+        "knob 8"
       ]
     },
     {
       "title": "Mod",
       "lines": [
-        "Pages:",
-        " Pitch, Harmonics,",
-        " Timbre, Cutoff,",
-        " Assign 1/2",
+        "Pages in order:",
+        "Pitch, Harmonics,",
+        "Timbre, Cutoff,",
+        "Assign 1, Assign 2",
         "",
-        "Assign 1/2 include",
+        "Assign pages set",
         "target + source",
-        "amounts",
-        "",
-        "Active pages show",
-        "a '*' marker."
+        "amounts. Active=*"
       ]
     },
     {
       "title": "Mod Sources",
       "lines": [
-        "LFO: shape/rate/",
-        " sync/retrig/phase",
-        " sync rate: 16 bars",
-        " .. 1/64",
-        "Envelope: ADSR",
-        "Cycling Env:",
-        " attack/decay/",
-        " shape/bipolar",
-        "Random: mode/rate/",
-        " sync/slew/retrig",
-        "Velocity curve",
-        "Poly AT curve",
-        "-1..+1 bipolar"
+        "LFO, Envelope,",
+        "Cycling Envelope,",
+        "Random, Velocity,",
+        "Poly Aftertouch",
+        "",
+        "LFO/Random sync",
+        "rates: 16 bars",
+        "to 1/64"
       ]
     },
     {
       "title": "Voice",
       "lines": [
-        "Voice Mode:",
-        " mono/poly/legato",
-        "Polyphony + Unison",
-        "budgeted to max",
-        "8 render voices",
-        "Detune + Spread",
-        "Glide in 5ms",
-        "steps"
+        "Modes: mono,",
+        "poly, mono legato",
+        "Mono modes allow",
+        "unison stacks,",
+        "but no chords",
+        "Poly allows",
+        "chords + unison",
+        "max voices: 8"
+      ]
+    },
+    {
+      "title": "Tips",
+      "lines": [
+        "Pitch mod range:",
+        "+/-48 semitones",
+        "(0.1 step)",
+        "Other mod depths",
+        "are -1..1",
+        "Glide is int ms",
+        "in 5ms steps",
+        "LPG has long tails"
       ]
     },
     {
