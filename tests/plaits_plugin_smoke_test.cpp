@@ -264,6 +264,16 @@ int main() {
         fail("lfo_rate should return free numeric Hz value when sync is off");
     }
 
+    api->set_param(inst, "lfo_sync", "sync");
+    char err_buf[256];
+    memset(err_buf, 0, sizeof(err_buf));
+    if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
+        fail("get_error failed after lfo_sync=sync");
+    }
+    if (err_buf[0] != '\0') {
+        fail("lfo_sync should accept paramlfo-style sync text");
+    }
+
     api->set_param(inst, "lfo_sync", "on");
     api->set_param(inst, "lfo_rate", "1/8");
     memset(lfo_rate_buf, 0, sizeof(lfo_rate_buf));
@@ -285,7 +295,6 @@ int main() {
 
     api->set_param(inst, "lfo_sync", "off");
     api->set_param(inst, "lfo_rate", "1/4");
-    char err_buf[256];
     memset(err_buf, 0, sizeof(err_buf));
     if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
         fail("get_error failed after lfo_rate enum write while sync off");
@@ -301,6 +310,15 @@ int main() {
         fail("lfo_rate should report numeric Hz in free mode");
     }
 
+    api->set_param(inst, "lfo_sync", "free");
+    memset(err_buf, 0, sizeof(err_buf));
+    if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
+        fail("get_error failed after lfo_sync=free");
+    }
+    if (err_buf[0] != '\0') {
+        fail("lfo_sync should accept paramlfo-style free text");
+    }
+
     api->set_param(inst, "random_sync", "off");
     api->set_param(inst, "random_rate", "5.25");
     char random_rate_buf[32];
@@ -310,6 +328,15 @@ int main() {
     }
     if (strcmp(random_rate_buf, "5.25") != 0) {
         fail("random_rate should return free numeric Hz value when sync is off");
+    }
+
+    api->set_param(inst, "random_sync", "sync");
+    memset(err_buf, 0, sizeof(err_buf));
+    if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
+        fail("get_error failed after random_sync=sync");
+    }
+    if (err_buf[0] != '\0') {
+        fail("random_sync should accept paramlfo-style sync text");
     }
 
     api->set_param(inst, "random_sync", "on");
@@ -346,6 +373,15 @@ int main() {
     }
     if (strchr(random_rate_buf, '/') != NULL) {
         fail("random_rate should report numeric Hz in free mode");
+    }
+
+    api->set_param(inst, "random_sync", "free");
+    memset(err_buf, 0, sizeof(err_buf));
+    if (api->get_error(inst, err_buf, (int)sizeof(err_buf)) < 0) {
+        fail("get_error failed after random_sync=free");
+    }
+    if (err_buf[0] != '\0') {
+        fail("random_sync should accept paramlfo-style free text");
     }
 
     char hierarchy_buf[32768];

@@ -817,8 +817,8 @@
         "name": "Sync",
         "type": "enum",
         "options": [
-          "off",
-          "on"
+          "free",
+          "sync"
         ]
       },
       {
@@ -952,8 +952,8 @@
         "name": "Sync",
         "type": "enum",
         "options": [
-          "off",
-          "on"
+          "free",
+          "sync"
         ]
       },
       {

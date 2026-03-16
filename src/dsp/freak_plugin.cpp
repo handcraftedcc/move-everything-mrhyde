@@ -92,11 +92,18 @@ static void set_error(freak_instance_t *inst, const char *msg) {
 
 static int parse_boolish(const char *val, int *out) {
     if (!val || !out) return 0;
-    if (strcmp(val, "1") == 0 || strcasecmp(val, "on") == 0 || strcasecmp(val, "true") == 0) {
+    if (strcmp(val, "1") == 0 ||
+        strcasecmp(val, "on") == 0 ||
+        strcasecmp(val, "true") == 0 ||
+        strcasecmp(val, "sync") == 0 ||
+        strcasecmp(val, "clock") == 0) {
         *out = 1;
         return 1;
     }
-    if (strcmp(val, "0") == 0 || strcasecmp(val, "off") == 0 || strcasecmp(val, "false") == 0) {
+    if (strcmp(val, "0") == 0 ||
+        strcasecmp(val, "off") == 0 ||
+        strcasecmp(val, "false") == 0 ||
+        strcasecmp(val, "free") == 0) {
         *out = 0;
         return 1;
     }
@@ -226,6 +233,10 @@ static int write_sync_rate_text(float hz, char *buf, int buf_len) {
     if (!buf || buf_len <= 0) return -1;
     int idx = nearest_sync_rate_index(hz, kSyncReferenceBpm);
     return snprintf(buf, buf_len, "%s", kSyncRateNames[idx]);
+}
+
+static int write_rate_mode_text(int sync_on, char *buf, int buf_len) {
+    return snprintf(buf, buf_len, "%s", sync_on ? "sync" : "free");
 }
 
 static int write_enum_text(const char *key, int value, char *buf, int buf_len) {
@@ -996,7 +1007,9 @@ static int get_param_internal(const freak_instance_t *inst, const char *key, cha
         }
         return snprintf(buf, buf_len, "%.6g", clampf(inst->params.lfo_rate, 0.01f, 40.0f));
     }
-    GET_ENUM_FIELD("lfo_sync", lfo_sync);
+    if (strcmp(key, "lfo_sync") == 0) {
+        return write_rate_mode_text(inst->params.lfo_sync, buf, buf_len);
+    }
     GET_ENUM_FIELD("lfo_retrig", lfo_retrig);
     GET_FLOAT_FIELD("lfo_phase", lfo_phase);
 
@@ -1020,7 +1033,9 @@ static int get_param_internal(const freak_instance_t *inst, const char *key, cha
         }
         return snprintf(buf, buf_len, "%.6g", clampf(inst->params.random_rate, 0.01f, 40.0f));
     }
-    GET_ENUM_FIELD("random_sync", random_sync);
+    if (strcmp(key, "random_sync") == 0) {
+        return write_rate_mode_text(inst->params.random_sync, buf, buf_len);
+    }
     GET_FLOAT_FIELD("random_slew", random_slew);
     GET_ENUM_FIELD("random_retrig", random_retrig);
 
