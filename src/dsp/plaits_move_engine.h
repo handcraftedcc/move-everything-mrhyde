@@ -160,7 +160,6 @@ public:
     void note_off(int note);
     void poly_aftertouch(int note, float pressure);
     void all_notes_off();
-    void panic();
 
     void render(float *out_l, float *out_r, int frames);
 
