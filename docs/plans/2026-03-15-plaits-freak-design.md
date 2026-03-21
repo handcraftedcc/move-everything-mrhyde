@@ -2,7 +2,7 @@
 
 ## Goal
 
-Build a Move Everything sound generator module inspired by MicroFreak that uses Mutable Instruments Plaits source code as its synthesis core, while keeping existing Move module packaging/layout conventions.
+Build a Schwung sound generator module inspired by MicroFreak that uses Mutable Instruments Plaits source code as its synthesis core, while keeping existing Move module packaging/layout conventions.
 
 ## Architecture
 

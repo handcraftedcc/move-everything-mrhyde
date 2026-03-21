@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Deliver a first working Move Everything module that uses vendored Mutable Instruments Plaits as the synthesis core, with all requested modulation sources and release/build parity.
+**Goal:** Deliver a first working Schwung module that uses vendored Mutable Instruments Plaits as the synthesis core, with all requested modulation sources and release/build parity.
 
 **Architecture:** Keep upstream Plaits/stmlib sources vendored and mostly unmodified, then implement a Move adapter engine/plugin layer that provides parameter mapping, modulation routing, MIDI handling, and output rendering. Preserve existing module packaging/build/release structure and add targeted tests around the wrapper behavior.
 
