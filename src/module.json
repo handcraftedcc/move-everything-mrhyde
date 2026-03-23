@@ -3,7 +3,7 @@
   "name": "MrHyde",
   "abbrev": "MRH",
   "version": "0.0.1",
-  "description": "MicroFreak-inspired Plaits sound generator for Move Everything",
+  "description": "MicroFreak-inspired Plaits sound generator for Schwung",
   "author": "move-anything contributors",
   "license": "MIT",
   "dsp": "dsp.so",

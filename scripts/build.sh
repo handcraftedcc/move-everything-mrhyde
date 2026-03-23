@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build MrHyde module for Move Anything (ARM64)
+# Build MrHyde module for Schwung (ARM64)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"

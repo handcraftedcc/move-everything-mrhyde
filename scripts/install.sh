@@ -10,7 +10,7 @@ if [[ ! -d "dist/freak" ]]; then
     exit 1
 fi
 
-TARGET_DIR="/data/UserData/move-anything/modules/sound_generators/freak"
+TARGET_DIR="/data/UserData/schwung/modules/sound_generators/freak"
 
 echo "=== Installing MrHyde Module ==="
 echo "Copying module to Move..."
@@ -23,4 +23,4 @@ ssh ableton@move.local "chmod -R a+rw ${TARGET_DIR}"
 echo ""
 echo "=== Install Complete ==="
 echo "Module installed to: ${TARGET_DIR}/"
-echo "Restart Move Anything to load the module."
+echo "Restart Schwung to load the module."

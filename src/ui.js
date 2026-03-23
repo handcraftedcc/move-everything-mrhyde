@@ -1,12 +1,12 @@
 /*
- * MrHyde UI for Move Anything
+ * MrHyde UI for Schwung
  *
  * Uses shared sound generator UI base for consistent preset browsing.
  * Parameter editing via shadow UI hierarchy when in chain context.
  */
 
 /* Shared utilities - absolute path for module location independence */
-import { createSoundGeneratorUI } from '/data/UserData/move-anything/shared/sound_generator_ui.mjs';
+import { createSoundGeneratorUI } from '/data/UserData/schwung/shared/sound_generator_ui.mjs';
 
 /* Create the UI with MrHyde-specific customizations */
 const ui = createSoundGeneratorUI({
