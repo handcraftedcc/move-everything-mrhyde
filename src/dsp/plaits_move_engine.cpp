@@ -127,6 +127,8 @@ constexpr int kChunkFrames = 12;
 constexpr int kMaxTriggerBlocks = 3;
 constexpr float kFixedVoiceMixGain = 0.3535533905932738f;  // 1/sqrt(8)
 constexpr float kSyncReferenceBpm = 120.0f;
+static const float kPitchCompensationSemitones =
+    12.0f * log2f(plaits::kCorrectedSampleRate / (float)PPF_SAMPLE_RATE);
 
 static const float kSyncRateBars[] = {
     16.0f,
@@ -935,7 +937,9 @@ void ppf_engine_t::render(float *out_l, float *out_r, int frames) {
             v.last_lpg_decay = lpg;
 
             plaits::Patch patch{};
-            patch.note = v.note_current + pitch;
+            // Align pitch to host sample-rate when running Plaits core outside
+            // its original 47.872kHz corrected hardware clock domain.
+            patch.note = v.note_current + pitch + kPitchCompensationSemitones;
             patch.harmonics = harmonics;
             patch.timbre = timbre;
             patch.morph = morph;
@@ -1066,5 +1070,9 @@ int ppf_engine_t::debug_release_samples_total_for_note(int note) const {
         if (v.release_samples_total > best) best = v.release_samples_total;
     }
     return best;
+}
+
+float ppf_engine_t::debug_pitch_compensation_semitones() const {
+    return kPitchCompensationSemitones;
 }
 #endif

@@ -170,6 +170,7 @@ public:
     float debug_voice_note_target(int voice_index) const;
     float debug_voice_pan(int voice_index) const;
     int debug_release_samples_total_for_note(int note) const;
+    float debug_pitch_compensation_semitones() const;
 #endif
 
 private:

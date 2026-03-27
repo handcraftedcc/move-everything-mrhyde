@@ -45,6 +45,11 @@ static float render_peak_after_skip(ppf_engine_t &engine, int skip_frames, int m
 
 int main() {
     ppf_engine_t engine;
+    float tuning_compensation = engine.debug_pitch_compensation_semitones();
+    if (tuning_compensation < 1.30f || tuning_compensation > 1.55f) {
+        fail("pitch compensation should account for Plaits corrected sample-rate offset");
+    }
+
     ppf_params_t params;
     ppf_default_params(&params);
     params.voice_mode = 1;  // poly
